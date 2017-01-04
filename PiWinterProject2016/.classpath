@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Desktop/winterProject/jsoup-1.10.1.jar" sourcepath="C:/Users/Jackson/.m2/repository/org/jsoup/jsoup/1.10.1/jsoup-1.10.1-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Desktop/winterProject/jsoup-1.10.1-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Desktop/winterProject/jsoup-1.10.1-javadoc.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Jackson/Desktop/winterProject/json-simple-1.1.1.jar"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Jackson/Desktop/winterProject/jsoup-1.10.1.jar" sourcepath="C:/Users/Jackson/.m2/repository/org/jsoup/jsoup/1.10.1/jsoup-1.10.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Jackson/Desktop/winterProject/jsoup-1.10.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Jackson/Desktop/winterProject/jsoup-1.10.1-javadoc.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Jackson/Desktop/winterProject/json-simple-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
