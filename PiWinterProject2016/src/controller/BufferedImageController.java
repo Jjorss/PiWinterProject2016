@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -29,7 +30,9 @@ public class BufferedImageController {
 		int colSize = 8;
 		
 		try {
-			bi = ImageIO.read(new File("img/weather/weatherIcons.png"));
+			 URL url = BufferedImageController.class.getResource(
+					 "/weather/weatherIcons.png");
+			bi = ImageIO.read(url);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -195,7 +198,7 @@ public class BufferedImageController {
 	
 	public BufferedImage makeWeatherData(Graphics g, Graphics2D g2, String precip,
 			String dewPoint, String humidity, String windSpeed, String storm){
-		int size = (int)(ui.getTempRect().getWidth()*0.05);
+		int size = (int)(ui.getTempRect().getWidth()*0.03);
 		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
 		String string = "<html><body style='padding: "+ padding +"px;'>"
                 + "<h1 style='font-size:" + size + "px;'>" + "Dew Point: " + dewPoint + "&deg;" +  "</h1>"

@@ -19,8 +19,8 @@ import controller.UiController;
 public class Program extends JPanel{
 	
 	private static final long serialVersionUID = 1L;
-	private static final int WIDTH = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-	private static final int HEIGHT = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	private static final int WIDTH = 800;//(int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+	private static final int HEIGHT = 480;//(int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private UiController ui = new UiController(this);
 	private Point sourcePoint;
 	
@@ -66,7 +66,7 @@ public class Program extends JPanel{
         frame.setSize(WIDTH, HEIGHT);
         frame.setFocusable(true);
         frame.getContentPane().add(this);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
         frame.setUndecorated(true);
         frame.setVisible(true);
         frame.addKeyListener(new KeyListener() {
