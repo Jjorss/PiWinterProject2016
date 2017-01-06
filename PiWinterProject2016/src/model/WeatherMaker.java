@@ -59,17 +59,25 @@ public class WeatherMaker {
 			JSONObject hourly = (JSONObject) json.get("minutely");
 			json = (JSONObject) json.get("currently");
 			
-//			this.setSummary((String)json.get("summary"));
-//			this.setTemperature((double)json.get("temperature"));
-//			this.setPrecipProbability((double)json.get("precipIntensity"));
-//			this.setFeelsLike((double)json.get("apparentTemperature"));
-//			this.setDewPoint((double)json.get("dewPoint"));
-//			this.setHumidity((double)json.get("humidity"));
-//			this.setWindSpeed((double)json.get("windSpeed"));
-//			this.setNearestStormDistance((long)json.get("nearestStormDistance"));
-//			this.setIcon((String)json.get("icon"));
-//			hourly = (JSONObject) hourly.get("summary");
-//			System.out.println(json);
+			this.setSummary((String)json.get("summary"));
+			this.setTemperature((double)json.get("temperature"));
+			
+			if (json.get("precipIntensity").getClass().equals(Long.class)) {
+				this.setPrecipProbability(((Long) json.get("precipIntensity")).doubleValue());
+			} else {
+				this.setPrecipProbability((double)json.get("precipIntensity"));
+			}
+			//this.setPrecipProbability((double)((int)json.get("precipIntensity"))); // recieves a long or a double
+			
+			
+			this.setFeelsLike((double)json.get("apparentTemperature"));
+			this.setDewPoint((double)json.get("dewPoint"));
+			this.setHumidity((double)json.get("humidity"));
+			this.setWindSpeed((double)json.get("windSpeed"));
+			this.setNearestStormDistance((long)json.get("nearestStormDistance"));
+			this.setIcon((String)json.get("icon"));
+			//hourly = (JSONObject) hourly.get("summary");
+			System.out.println(json);
 			this.setHourlySummary((String)hourly.get("summary"));
 			
 			System.out.println("summary " +this.summary);

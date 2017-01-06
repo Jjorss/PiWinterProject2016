@@ -118,8 +118,9 @@ public class BufferedImageController {
 	}
 	
 	public void makeThread(Graphics g, Graphics2D g2, String title, String comment, int width, BufferedImage tn){
+		int size = (int)(ui.getBoxes().get(0).getHeight() * 0.045);
 		String string = "<html><body style='width:"+ width +"px; padding: 5px;'>"
-                + "<h1>" + title +  "</h1>";
+                + "<h1 style='font-size:" + size + "px;'>" + title +  "</h1>";
 				
 		if (tn!=null) {
 			string = string 

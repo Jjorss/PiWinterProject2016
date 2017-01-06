@@ -601,5 +601,8 @@ public class UiController {
 	public void setPosts(List<BufferedImage> posts) {
 		this.posts = posts;
 	}
+	public List<Rectangle2D> getBoxes() {
+		return boxes;
+	}
 
 }
