@@ -4,7 +4,7 @@ raspberryPi winter project 2016-17
 <ul>
   <li>Fix time scaling</li>
   <li>Fix font scaling</li>
-  <li>Fix Quote scaling</li>
+  <li>Fix Line being able to draw on sidebar</li>
   <li>Fix never ending line in draw tab</li>
   <li>Fix thread scaling</li>
 </ul>
