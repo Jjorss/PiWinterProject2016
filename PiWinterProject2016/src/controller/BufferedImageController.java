@@ -318,7 +318,7 @@ public class BufferedImageController {
 	}
 	
 	public BufferedImage makeQuote(Graphics g, Graphics2D g2, String quote, String author){
-		int size = (int)(ui.getDisplayRect().getWidth()*0.04);
+		int size = (int)(ui.getDisplayRect().getHeight()*0.05);
 		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
 		String string = "<html><body style='padding: "+ padding +"px;'>"
                 + "<h1 style='font-size:" + size + "px; text-align: center;'>"  + quote + "</h1>"
