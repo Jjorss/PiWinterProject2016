@@ -58,6 +58,9 @@ public class UiController {
 	private BufferedImage timeImage;
 	private BufferedImage quoteImage;
 	
+	private DateFormat dateFormatTime;
+	private DateFormat dateFormatDate;
+	private Date date;
 	
 	private int numRows;
 	private int numCols;
@@ -179,8 +182,14 @@ public class UiController {
 				, qb.getDailyQuotes(), qb.getAuthor());
 		
 		db = new DrawBuilder();
+		dateFormatTime = new SimpleDateFormat("HH:mm:ss");
+		dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
+		date = new Date();
+		//System.out.println(dateFormat.format(date)); //2016/11/16 12:08:43
+		this.timeImage = bi.makeTime(program.getGraphics(), (Graphics2D)program.getGraphics(),
+				dateFormatTime.format(date), dateFormatDate.format(date));
 		
-		System.out.println("Initialized");
+		System.out.println("Initialized");		
 		this.currentState = State.HOME;
 		
 	}
@@ -189,12 +198,10 @@ public class UiController {
 		switch(this.currentState) {
 		case LOADING:
 			this.init();
+			
 			break;
 		case HOME:
-			DateFormat dateFormatTime = new SimpleDateFormat("HH:mm:ss");
-			DateFormat dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
-			Date date = new Date();
-			//System.out.println(dateFormat.format(date)); //2016/11/16 12:08:43
+			date = new Date();
 			this.timeImage = bi.makeTime(program.getGraphics(), (Graphics2D)program.getGraphics(),
 					dateFormatTime.format(date), dateFormatDate.format(date));
 			break;

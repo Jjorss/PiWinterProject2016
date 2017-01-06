@@ -7,5 +7,4 @@ raspberryPi winter project 2016-17
   <li>Fix Line being able to draw on sidebar</li>
   <li>Fix never ending line in draw tab</li>
   <li>Make thread font scale or cut off</li>
-  <li>Fix null pointer exception in UiController</li>
 </ul>
