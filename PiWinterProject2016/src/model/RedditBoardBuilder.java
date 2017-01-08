@@ -41,7 +41,7 @@ public class RedditBoardBuilder {
 			for (int i = 0; i < threads.size(); i++) {
 				Thread thread = this.threads.get(i);
 				thread.setComments(pulledThreads.get(i).text());
-				System.out.println(threads.size());
+				//System.out.println(threads.size());
 			}
 			
 			for (Thread thread : threads) {

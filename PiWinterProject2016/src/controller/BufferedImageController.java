@@ -118,18 +118,23 @@ public class BufferedImageController {
 	}
 	
 	public void makeThread(Graphics g, Graphics2D g2, String title, String comment, int width, BufferedImage tn){
-		int size = (int)(ui.getBoxes().get(0).getHeight() * 0.045);
+		int size = (int)(ui.getBoxes().get(0).getHeight() * 0.062);
+		int commentSize = (int)(size*0.85);
+		if (title.length() > 90) {
+			title = title.substring(0, 85) + "....";
+		}
+		
 		String string = "<html><body style='width:"+ width +"px; padding: 5px;'>"
                 + "<h1 style='font-size:" + size + "px;'>" + title +  "</h1>";
 				
 		if (tn!=null) {
 			string = string 
-					+ "<h2>(Tap to see image)</h2>"
-					+ "<h2>" + comment + "</h2>"
+					+ "<h2 style='font-size:" + commentSize + "px;'>" + "(Tap to see image)</h2>"
+					+ "<h2 style='font-size:" + commentSize + "px;'>" + comment + "</h2>"
 					+ "</body></html>";
 		} else {
 			string = string
-					+ "<h2>" + comment + "</h2>"
+					+ "<h2 style='font-size:" + commentSize + "px;'>" + comment + "</h2>"
 					+ "</body></html>";
 		}
 
@@ -159,7 +164,7 @@ public class BufferedImageController {
 	}
 	
 	public BufferedImage makeTemperature(Graphics g, Graphics2D g2, String temp, String feelsLike){
-		int size = (int)(ui.getTempRect().getWidth()*0.23);
+		int size = (int)(ui.getTempRect().getHeight()*0.28);
 		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
 		//15
 		String string = "<html><body style='padding: "+ padding +"px;'>"
@@ -199,14 +204,14 @@ public class BufferedImageController {
 	
 	public BufferedImage makeWeatherData(Graphics g, Graphics2D g2, String precip,
 			String dewPoint, String humidity, String windSpeed, String storm){
-		int size = (int)(ui.getTempRect().getWidth()*0.03);
+		int size = (int)(ui.getTempRect().getHeight()*0.08);
 		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
-		String string = "<html><body style='padding: "+ padding +"px;'>"
-                + "<h1 style='font-size:" + size + "px;'>" + "Dew Point: " + dewPoint + "&deg;" +  "</h1>"
-                + "<h1 style='font-size:" + size + "px;'>" + "Humidity: " + humidity + "&#37;" +  "</h1>"
-                + "<h1 style='font-size:" + size + "px;'>" + "Chance of Rain: " + precip +  "</h1>"
-                + "<h1 style='font-size:" + size + "px;'>" + "Wind Speed: " + windSpeed + "MPH" +  "</h1>"
-                + "<h1 style='font-size:" + size + "px;'>" + "Nearest Storm Distance: " + storm + "M" +  "</h1>"
+		String string = "<html><body style='padding: "+ padding +"px, 'margin: 0px';'>"
+                + "<p style='font-size:" + size + "px;'>" + "Dew Point: " + dewPoint + "&deg;" +  "</p>"
+                + "<p style='font-size:" + size + "px;'>" + "Humidity: " + humidity + "&#37;" +  "</p>"
+                + "<p style='font-size:" + size + "px;'>" + "Chance of Rain: " + precip +  "</p>"
+                + "<p style='font-size:" + size + "px;'>" + "Wind Speed: " + windSpeed + "MPH" +  "</p>"
+                + "<p style='font-size:" + size + "px;'>" + "Nearest Storm Distance: " + storm + "M" +  "</p>"
                 + "</body></html>";
 				
 		
@@ -280,7 +285,7 @@ public class BufferedImageController {
 	}
 	
 	public BufferedImage makeTime(Graphics g, Graphics2D g2, String time, String date){
-		int size = (int)(ui.getTimeRect().getWidth()*0.14);
+		int size = (int)(ui.getTimeRect().getHeight()*0.16);
 		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
 		String string = "<html><body style='padding: "+ padding +"px;'>"
                 + "<h1 style='font-size:" + size + "px; text-align: center;'>"  + time + "</h1>"

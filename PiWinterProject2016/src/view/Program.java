@@ -1,8 +1,10 @@
 package view;
 
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -19,8 +21,8 @@ import controller.UiController;
 public class Program extends JPanel{
 	
 	private static final long serialVersionUID = 1L;
-	private static final int WIDTH = 800;//(int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-	private static final int HEIGHT = 480;//(int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	private static final int WIDTH = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+	private static final int HEIGHT = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private UiController ui = new UiController(this);
 	private Point sourcePoint;
 	
@@ -61,12 +63,13 @@ public class Program extends JPanel{
 
 	public Program() {
 		super();
-		JFrame frame = new JFrame("Game");
+		JFrame frame = new JFrame("Dash Board");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(true);
         frame.setSize(WIDTH, HEIGHT);
         frame.setFocusable(true);
         frame.getContentPane().add(this);
-        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setUndecorated(true);
         frame.setVisible(true);
         frame.addKeyListener(new KeyListener() {

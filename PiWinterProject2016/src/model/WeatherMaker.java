@@ -69,8 +69,11 @@ public class WeatherMaker {
 			}
 			//this.setPrecipProbability((double)((int)json.get("precipIntensity"))); // recieves a long or a double
 			
-			
-			this.setFeelsLike((double)json.get("apparentTemperature"));
+			if (json.get("apparentTemperature").getClass().equals(Long.class)) {
+				this.setFeelsLike(((Long)json.get("apparentTemperature")).doubleValue());
+			} else {
+				this.setFeelsLike((double)json.get("apparentTemperature"));
+			}
 			this.setDewPoint((double)json.get("dewPoint"));
 			this.setHumidity((double)json.get("humidity"));
 			this.setWindSpeed((double)json.get("windSpeed"));

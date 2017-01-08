@@ -8,7 +8,6 @@ raspberryPi winter project 2016-17
       <li>Fix font of weather data(too small)</li>
       <li>Fix temp font size, too big</li>
       <li>Window size it too big b/c of Pi's task bar</li>
-      <li>Fix comment font size on threads, increase font size for title</li>
     </ul>
   <li>Fix Line being able to draw on sidebar</li>
   <li>Fix never ending line in draw tab</li>
