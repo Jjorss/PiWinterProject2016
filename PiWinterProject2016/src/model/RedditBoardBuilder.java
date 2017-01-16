@@ -21,10 +21,10 @@ public class RedditBoardBuilder {
 	
 	private List<Thread> threads = new ArrayList<Thread>();
 
-	public void getData(){
+	public void getData(String subReddit){
 		Document doc = null;
 		try {
-			doc = Jsoup.connect("https://www.reddit.com/r/elderscrollsonline/").timeout(50000).userAgent("Mozilla").get();
+			doc = Jsoup.connect("https://www.reddit.com/" + subReddit).timeout(50000).userAgent("Mozilla").get();
 			Elements pulledThreads = doc.getElementsByClass("title may-blank ");
 			
 			for(Element thread : pulledThreads) {
@@ -78,7 +78,7 @@ public class RedditBoardBuilder {
 	// test main
 	public static void main(String[] args) {
 		RedditBoardBuilder rbb = new RedditBoardBuilder();
-		rbb.getData();
+		rbb.getData("r/elderscrollsonline/");
 		System.out.println("Done: " + rbb.threads.size());
 	}
 

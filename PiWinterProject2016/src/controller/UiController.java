@@ -10,6 +10,7 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,6 +21,7 @@ import java.util.List;
 import model.DrawBuilder;
 import model.QuoteBuilder;
 import model.RedditBoardBuilder;
+import model.RedditState;
 import model.Resolution;
 import model.State;
 import model.WeatherMaker;
@@ -34,9 +36,11 @@ public class UiController {
 	private QuoteBuilder qb;
 	private DrawBuilder db;
 	private State currentState = State.LOADING;
+	private RedditState currentRedditState = RedditState.Home;
 	
 	private Rectangle2D sideBar;
 	private Rectangle2D contentBox;
+	// home screen rectangles
 	private Rectangle2D weatherRect;
 	private Rectangle2D tempRect;
 	private Rectangle2D weatherDataRect;
@@ -44,19 +48,26 @@ public class UiController {
 	private Rectangle2D weatherIconRect;
 	private Rectangle2D timeRect;
 	private Rectangle2D displayRect; // temp bottom rect on home screen
+	// reddit rectangles
+	private Rectangle2D redditHomeRect;
+	private RoundRectangle2D redditContainer;
 	
 	private List<Rectangle2D> boxes = new ArrayList<Rectangle2D>();
 	private List<Rectangle2D> iconBoxes = new ArrayList<Rectangle2D>();
 	private List<Rectangle2D> icons = new ArrayList<Rectangle2D>();
+	private List<Rectangle2D> pinnedGrid = new ArrayList<Rectangle2D>();
 	
 	
 	private List<BufferedImage> posts = new ArrayList<BufferedImage>();
+	private List<BufferedImage> pins = new ArrayList<BufferedImage>();
+	
 	
 	private BufferedImage temperatureImage;
 	private BufferedImage weatherDataImage;
 	private BufferedImage summaryImage; 
 	private BufferedImage timeImage;
 	private BufferedImage quoteImage;
+	private BufferedImage focusedThreadImage;
 	
 	private DateFormat dateFormatTime;
 	private DateFormat dateFormatDate;
@@ -68,6 +79,7 @@ public class UiController {
 
 	
 	private String[] tempArray = new String[]{"H", "R", "D", "T", "T", "T"};
+	private String[] tempPinnedArray = new String[]{"r/elderscrollsonline/", "Reddit", "r/frugalmalefashion/"};
 	
 	public UiController(Program program){
 		this.program = program;
@@ -78,30 +90,6 @@ public class UiController {
 		this.sideBar = new Rectangle2D.Double(0,0, program.getWidth()*0.1, program.getHeight());
 		this.contentBox = new Rectangle2D.Double(this.sideBar.getX()+this.sideBar.getWidth(), 0,
 				program.getWidth() - this.sideBar.getWidth(), this.program.getHeight());
-		this.numRows = 3;
-		this.numCols = 3;
-		this.rb = new RedditBoardBuilder();
-		this.rb.getData();
-		this.totalNumCols = this.rb.getThreads().size() / 3;
-		for(int i = 0; i < totalNumCols; i++) {
-			for(int j = 0; j < numCols; j++) {
-				boxes.add(new Rectangle2D.Double(this.contentBox.getX() + ((this.contentBox.getWidth()/numRows) * i),
-						this.contentBox.getY() + ((this.contentBox.getHeight()/numCols) * j),
-						this.contentBox.getWidth()/numCols,
-						this.contentBox.getHeight()/numRows));
-			}
-		}
-
-		
-		
-		int width = (int)(boxes.get(0).getWidth()*0.7);
-		for (int i = 0; i < this.rb.getThreads().size(); i++) {
-			bi.makeThread(program.getGraphics(), (Graphics2D)program.getGraphics(),
-					this.rb.getThreads().get(i).getTitle(),
-					this.rb.getThreads().get(i).getComments(),
-					width,
-					this.rb.getThreads().get(i).getImage());
-		}
 		
 		double iconBoxesWidth = this.sideBar.getWidth() * 0.7;
 		for (int i = 0; i < 5; i++) {
@@ -188,10 +176,66 @@ public class UiController {
 		//System.out.println(dateFormat.format(date)); //2016/11/16 12:08:43
 		this.timeImage = bi.makeTime(program.getGraphics(), (Graphics2D)program.getGraphics(),
 				dateFormatTime.format(date), dateFormatDate.format(date));
+		double redditHomeWidth = this.contentBox.getWidth()*0.8;
+		redditHomeRect = new Rectangle2D.Double(
+				(this.contentBox.getX() + this.contentBox.getWidth()/2) - (redditHomeWidth/2),
+				this.contentBox.getY() + (this.contentBox.getHeight()*0.05),
+				redditHomeWidth,
+				this.contentBox.getHeight()*0.6);
+		numCols = 2;
+		numRows = 2;
+		for(int i = 0; i < 2; i++) {
+			for(int j = 0; j < numCols; j++) {
+				this.pinnedGrid.add(new Rectangle2D.Double(
+						this.redditHomeRect.getX() + ((this.redditHomeRect.getWidth()/numRows) * i),
+						this.redditHomeRect.getY() + ((this.redditHomeRect.getHeight()/numCols) * j),
+						this.redditHomeRect.getWidth()/numCols,
+						this.redditHomeRect.getHeight()/numRows));
+			}
+		}
+		for(int i = 0; i < this.tempPinnedArray.length; i++) {
+			this.pins.add(this.bi.makePin(program.getGraphics(), (Graphics2D)program.getGraphics(), this.tempPinnedArray[i]));
+		}
+		double redditContainerWidth = this.contentBox.getWidth()*0.75;
+		double redditContainerHeight = this.contentBox.getHeight() * 0.9;
+		redditContainer = new RoundRectangle2D.Double(
+				(this.contentBox.getX() + (this.contentBox.getWidth()/2)) - (redditContainerWidth/2),
+				(this.contentBox.getY() + (this.contentBox.getHeight()/2)) - (redditContainerHeight/2),
+				redditContainerWidth,
+				redditContainerHeight,
+				50,
+				50);
 		
 		System.out.println("Initialized");		
 		this.currentState = State.HOME;
 		
+	}
+	
+	public void initSubReddit(String subReddit) {
+		this.posts.clear();
+		this.boxes.clear();
+		this.numRows = 3;
+		this.numCols = 3;
+		this.rb = new RedditBoardBuilder();
+		this.rb.getData(subReddit);
+		this.totalNumCols = this.rb.getThreads().size() / 3;
+		for(int i = 0; i < totalNumCols; i++) {
+			for(int j = 0; j < numCols; j++) {
+				boxes.add(new Rectangle2D.Double(this.contentBox.getX() + ((this.contentBox.getWidth()/numRows) * i),
+						this.contentBox.getY() + ((this.contentBox.getHeight()/numCols) * j),
+						this.contentBox.getWidth()/numCols,
+						this.contentBox.getHeight()/numRows));
+			}
+		}		
+		int width = (int)(boxes.get(0).getWidth()*0.7);
+		for (int i = 0; i < this.rb.getThreads().size(); i++) {
+			bi.makeThread(program.getGraphics(), (Graphics2D)program.getGraphics(),
+					this.rb.getThreads().get(i).getTitle(),
+					this.rb.getThreads().get(i).getComments(),
+					width,
+					this.rb.getThreads().get(i).getImage());
+		}
+		this.currentRedditState = RedditState.Page;
 	}
 	
 	public void loop() {
@@ -243,8 +287,32 @@ public class UiController {
 			break;
 		case REDDIT:
 			this.renderContentBox(g2);
-			this.renderThreads(g2, g2);
-			this.renderBoxes(g2);
+			switch(this.currentRedditState) {
+			case Home:
+				this.renderRedditHome(g2);
+				this.renderPinnedGrid(g2);
+				this.renderPinnedSubs(g2);
+				break;
+			case Loading:
+				this.renderRedditLoading(g2);
+				break;
+			case Page:
+				this.renderThreads(g2, g2);
+				this.renderBoxes(g2);
+				break;
+			case Image:
+				this.renderThreads(g2, g2);
+				this.renderBoxes(g2);
+				this.renderRedditImage(g2);
+				break;
+			default:
+				this.renderContentBox(g2);
+				this.renderSideBar(g2);
+				this.renderIconsBoxes(g2);
+				this.renderIcons(g2);
+				break;
+			}
+			
 			this.renderSideBar(g2);
 			this.renderIconsBoxes(g2);
 			this.renderIcons(g2);
@@ -260,6 +328,66 @@ public class UiController {
 			break;
 		}
 	
+	}
+	
+	public void renderRedditImage(Graphics2D g2) {
+		g2.setColor(new Color(255, 255, 255, 200));
+		g2.draw(redditContainer);
+		g2.fill(redditContainer);
+		
+		BufferedImage img = this.focusedThreadImage;
+		Resolution res = this.bi.scaleImage(img.getWidth(),
+				img.getHeight(),
+				(int)(redditContainer.getWidth()*0.9),
+				(int)(redditContainer.getHeight()*0.9));
+		int width = res.getWidth();
+		
+		int height = res.getHeight();
+		g2.drawImage(
+				img,
+				(int)( redditContainer.getX() + (redditContainer.getWidth()/2) - (width/2) ),
+				(int)(int)( redditContainer.getY() + (redditContainer.getHeight()/2) - (height/2) ),
+				width,
+				height,
+				program);
+		
+	}
+	
+	public void renderRedditHome(Graphics2D g2) {
+		g2.setColor(Color.ORANGE);
+		g2.draw(redditHomeRect);
+		//g2.fill(redditHomeRect);
+		//System.out.println(this.redditHomeRect);
+
+	}
+	public void renderPinnedGrid(Graphics2D g2) {
+		g2.setColor(Color.BLUE);
+		for (Rectangle2D pinned : this.pinnedGrid) {
+			g2.draw(pinned);
+			//g2.fill(pinned);
+		}
+		
+	}
+	
+	public void renderPinnedSubs(Graphics2D g2) {
+		g2.setColor(Color.ORANGE);
+		int index = 0;
+		for(BufferedImage pin : this.pins) {
+			Rectangle2D cell = this.getPinnedGrid().get(index);
+			g2.drawImage(pin,
+					(int)( cell.getX() + (cell.getWidth()/2) - (pin.getWidth()/2) ),
+					(int)(int)( cell.getY() + (cell.getHeight()/2) - (pin.getHeight()/2) ),
+					pin.getWidth(),
+					pin.getHeight(),
+					program);
+			index++;
+		}
+	}
+	
+	public void renderRedditLoading(Graphics2D g2) {
+		g2.setFont(new Font("Arial", Font.BOLD, (int)(this.contentBox.getHeight()*0.1)));
+		g2.setColor(Color.WHITE);
+		g2.drawString("LOADING.....", (int)this.contentBox.getX()/2, (int)this.contentBox.getY()/2);
 	}
 	
 	public void renderDrawing(Graphics2D g2) {
@@ -452,11 +580,50 @@ public class UiController {
 			this.handleClickedSideButton(p);
 		}
 		if (this.contentBox.contains(p)) {
-			this.handleShowImage(p);
+			switch(this.currentState) {
+			case DRAW:
+				break;
+			case HOME:
+				break;
+			case LOADING:
+				break;
+			case REDDIT:
+				switch(this.currentRedditState) {
+				case Home:
+					this.handleGoToSubReddit(p);
+					break;
+				case Loading:
+					break;
+				case Page:
+					this.handleShowImage(p);
+					break;
+				case Image:
+					handleHideImage();
+					break;
+				default:
+					break;
+				
+				}
+				break;
+			default:
+				break;
+			
+			}	
 		}
-		
 	}
 	
+	public void handleGoToSubReddit(Point p) {
+		for(int i = 0; i < this.pinnedGrid.size(); i++) {
+			Rectangle2D box = this.pinnedGrid.get(i);
+			if(box.contains(p)) {
+				// change state to loading
+				this.currentRedditState = RedditState.Loading;
+				// pull threads
+				// change state back at end of method call
+				this.initSubReddit(this.tempPinnedArray[i]);
+			}
+		}
+	}
 	
 	
 	public void handleShowImage(Point p) {
@@ -465,11 +632,18 @@ public class UiController {
 			if(box.contains(p)) {
 				if (this.rb.getThreads().get(i).isShowImage()) {
 					this.rb.getThreads().get(i).setShowImage(false);
+					this.currentRedditState = RedditState.Page;
 				} else {
-					this.rb.getThreads().get(i).setShowImage(true);
+					//this.rb.getThreads().get(i).setShowImage(true);
+					this.setFocusedThreadImage(this.rb.getThreads().get(i).getImage());
+					this.currentRedditState = RedditState.Image;
 				}
 			}
 		}
+	}
+	
+	public void handleHideImage() {
+		this.currentRedditState = RedditState.Page;
 	}
 	
 	public void handleClickedSideButton(Point p) {
@@ -483,6 +657,7 @@ public class UiController {
 					break;
 				case 1:
 					this.currentState = State.REDDIT;
+					this.currentRedditState = RedditState.Home;
 					System.out.println("swtiching to reddit");
 					break;
 				case 2:
@@ -610,6 +785,30 @@ public class UiController {
 	}
 	public List<Rectangle2D> getBoxes() {
 		return boxes;
+	}
+
+	public RedditState getCurrentRedditStat() {
+		return currentRedditState;
+	}
+
+	public void setCurrentRedditStat(RedditState currentRedditStat) {
+		this.currentRedditState = currentRedditStat;
+	}
+
+	public List<Rectangle2D> getPinnedGrid() {
+		return pinnedGrid;
+	}
+
+	public void setPinnedGrid(List<Rectangle2D> pinnedGrid) {
+		this.pinnedGrid = pinnedGrid;
+	}
+
+	public BufferedImage getFocusedThreadImage() {
+		return focusedThreadImage;
+	}
+
+	public void setFocusedThreadImage(BufferedImage focusedThreadImage) {
+		this.focusedThreadImage = focusedThreadImage;
 	}
 
 }

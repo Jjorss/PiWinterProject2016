@@ -60,7 +60,13 @@ public class WeatherMaker {
 			json = (JSONObject) json.get("currently");
 			
 			this.setSummary((String)json.get("summary"));
-			this.setTemperature((double)json.get("temperature"));
+			
+			if (json.get("temperature").getClass().equals(Long.class)) {
+				this.setTemperature(((Long) json.get("temperature")).doubleValue());
+				
+			} else {
+				this.setTemperature((double)json.get("temperature"));
+			}
 			
 			if (json.get("precipIntensity").getClass().equals(Long.class)) {
 				this.setPrecipProbability(((Long) json.get("precipIntensity")).doubleValue());
@@ -76,7 +82,12 @@ public class WeatherMaker {
 			}
 			this.setDewPoint((double)json.get("dewPoint"));
 			this.setHumidity((double)json.get("humidity"));
-			this.setWindSpeed((double)json.get("windSpeed"));
+			
+			if (json.get("windSpeed").getClass().equals(Long.class)) {
+				this.setWindSpeed(((Long) json.get("windSpeed")).doubleValue());
+			} else {
+				this.setWindSpeed((double)json.get("windSpeed"));
+			}
 			this.setNearestStormDistance((long)json.get("nearestStormDistance"));
 			this.setIcon((String)json.get("icon"));
 			//hourly = (JSONObject) hourly.get("summary");
