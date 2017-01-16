@@ -335,22 +335,24 @@ public class UiController {
 		g2.draw(redditContainer);
 		g2.fill(redditContainer);
 		
-		BufferedImage img = this.focusedThreadImage;
-		Resolution res = this.bi.scaleImage(img.getWidth(),
-				img.getHeight(),
-				(int)(redditContainer.getWidth()*0.9),
-				(int)(redditContainer.getHeight()*0.9));
-		int width = res.getWidth();
-		
-		int height = res.getHeight();
-		g2.drawImage(
-				img,
-				(int)( redditContainer.getX() + (redditContainer.getWidth()/2) - (width/2) ),
-				(int)(int)( redditContainer.getY() + (redditContainer.getHeight()/2) - (height/2) ),
-				width,
-				height,
-				program);
-		
+		if (this.focusedThreadImage != null) {
+			BufferedImage img = this.focusedThreadImage;
+			Resolution res = this.bi.scaleImage(img.getWidth(),
+					img.getHeight(),
+					(int)(redditContainer.getWidth()*0.9),
+					(int)(redditContainer.getHeight()*0.9));
+			int width = res.getWidth();
+			
+			int height = res.getHeight();
+			g2.drawImage(
+					img,
+					(int)( redditContainer.getX() + (redditContainer.getWidth()/2) - (width/2) ),
+					(int)(int)( redditContainer.getY() + (redditContainer.getHeight()/2) - (height/2) ),
+					width,
+					height,
+					program);
+			
+		}
 	}
 	
 	public void renderRedditHome(Graphics2D g2) {

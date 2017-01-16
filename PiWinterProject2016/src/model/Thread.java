@@ -7,6 +7,7 @@ public class Thread {
 	private String link;
 	private String title;
 	private String comments;
+	private String imgLink = "";
 	private BufferedImage image = null;
 	private boolean showImage = false;
 	
@@ -54,5 +55,13 @@ public class Thread {
 
 	public void setShowImage(boolean showImage) {
 		this.showImage = showImage;
+	}
+
+	public String getImgLink() {
+		return imgLink;
+	}
+
+	public void setImgLink(String imgLink) {
+		this.imgLink = imgLink;
 	}
 }
