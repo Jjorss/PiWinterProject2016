@@ -11,10 +11,11 @@ public class Thread {
 	private BufferedImage image = null;
 	private boolean showImage = false;
 	
-	public Thread(String link, String title, String comments){
+	public Thread(String link, String title, String comments, String imgLink){
 		this.setLink(link);
 		this.setTitle(title);
 		this.setComments(comments);
+		this.setImgLink(imgLink);
 	}
 
 	public String getLink() {

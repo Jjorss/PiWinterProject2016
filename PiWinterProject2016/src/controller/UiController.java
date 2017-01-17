@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.SwingWorker;
+
 import model.DrawBuilder;
 import model.QuoteBuilder;
 import model.RedditBoardBuilder;
@@ -80,6 +82,8 @@ public class UiController {
 	
 	private String[] tempArray = new String[]{"H", "R", "D", "T", "T", "T"};
 	private String[] tempPinnedArray = new String[]{"r/elderscrollsonline/", "Reddit", "r/frugalmalefashion/"};
+	
+	private String loadingThreadStatus = "0%";
 	
 	public UiController(Program program){
 		this.program = program;
@@ -216,26 +220,48 @@ public class UiController {
 		this.boxes.clear();
 		this.numRows = 3;
 		this.numCols = 3;
-		this.rb = new RedditBoardBuilder();
-		this.rb.getData(subReddit);
-		this.totalNumCols = this.rb.getThreads().size() / 3;
-		for(int i = 0; i < totalNumCols; i++) {
-			for(int j = 0; j < numCols; j++) {
-				boxes.add(new Rectangle2D.Double(this.contentBox.getX() + ((this.contentBox.getWidth()/numRows) * i),
-						this.contentBox.getY() + ((this.contentBox.getHeight()/numCols) * j),
-						this.contentBox.getWidth()/numCols,
-						this.contentBox.getHeight()/numRows));
-			}
-		}		
-		int width = (int)(boxes.get(0).getWidth()*0.7);
-		for (int i = 0; i < this.rb.getThreads().size(); i++) {
-			bi.makeThread(program.getGraphics(), (Graphics2D)program.getGraphics(),
-					this.rb.getThreads().get(i).getTitle(),
-					this.rb.getThreads().get(i).getComments(),
-					width,
-					this.rb.getThreads().get(i).getImage());
-		}
-		this.currentRedditState = RedditState.Page;
+		this.rb = new RedditBoardBuilder(this, subReddit);
+		this.rb.execute();
+		
+//		SwingWorker<Integer, String> worker = new SwingWorker<Integer, String>() {
+//
+//			@Override
+//			protected Integer doInBackground() throws Exception {
+//				currentRedditState = RedditState.Loading;
+//				System.out.println("switched to reddit state: " + currentRedditState);
+//				rb.getData(subReddit);
+//				return 1;
+//			}
+//			@Override
+//			 public void done() {
+//				totalNumCols = rb.getThreads().size() / 3;
+//				for(int i = 0; i < totalNumCols; i++) {
+//					for(int j = 0; j < numCols; j++) {
+//						boxes.add(new Rectangle2D.Double(contentBox.getX() + ((contentBox.getWidth()/numRows) * i),
+//								contentBox.getY() + ((contentBox.getHeight()/numCols) * j),
+//								contentBox.getWidth()/numCols,
+//								contentBox.getHeight()/numRows));
+//					}
+//				}		
+//				int width = (int)(boxes.get(0).getWidth()*0.7);
+//				for (int i = 0; i < rb.getThreads().size(); i++) {
+//					bi.makeThread(program.getGraphics(), (Graphics2D)program.getGraphics(),
+//							rb.getThreads().get(i).getTitle(),
+//							rb.getThreads().get(i).getComments(),
+//							width,
+//							rb.getThreads().get(i).getImage());
+//				}
+//				currentRedditState = RedditState.Page;
+//				System.out.println("switched to reddit state: " + currentRedditState);
+//			}
+//			@Override
+//			protected void process(List<String> chunks) {
+//			    // Messages received from the doInBackground() (when invoking the publish() method)
+//			}
+//			
+//		};
+//		worker.execute();
+		
 	}
 	
 	public void loop() {
@@ -289,18 +315,22 @@ public class UiController {
 			this.renderContentBox(g2);
 			switch(this.currentRedditState) {
 			case Home:
+				this.renderContentBox(g2);
 				this.renderRedditHome(g2);
 				this.renderPinnedGrid(g2);
 				this.renderPinnedSubs(g2);
 				break;
 			case Loading:
+				this.renderContentBox(g2);
 				this.renderRedditLoading(g2);
 				break;
 			case Page:
+				this.renderContentBox(g2);
 				this.renderThreads(g2, g2);
 				this.renderBoxes(g2);
 				break;
 			case Image:
+				this.renderContentBox(g2);
 				this.renderThreads(g2, g2);
 				this.renderBoxes(g2);
 				this.renderRedditImage(g2);
@@ -389,7 +419,9 @@ public class UiController {
 	public void renderRedditLoading(Graphics2D g2) {
 		g2.setFont(new Font("Arial", Font.BOLD, (int)(this.contentBox.getHeight()*0.1)));
 		g2.setColor(Color.WHITE);
-		g2.drawString("LOADING.....", (int)this.contentBox.getX()/2, (int)this.contentBox.getY()/2);
+		g2.drawString(this.rb.getProgress()+"%",
+				(int)this.contentBox.getWidth()/2, (int)this.contentBox.getHeight()/2);
+		
 	}
 	
 	public void renderDrawing(Graphics2D g2) {
@@ -631,7 +663,7 @@ public class UiController {
 	public void handleShowImage(Point p) {
 		for(int i = 0; i < this.boxes.size(); i++) {
 			Rectangle2D box = this.boxes.get(i);
-			if(box.contains(p)) {
+			if(box.contains(p) && this.rb.getThreads().get(i).getImage()!=null) {
 				if (this.rb.getThreads().get(i).isShowImage()) {
 					this.rb.getThreads().get(i).setShowImage(false);
 					this.currentRedditState = RedditState.Page;
@@ -811,6 +843,194 @@ public class UiController {
 
 	public void setFocusedThreadImage(BufferedImage focusedThreadImage) {
 		this.focusedThreadImage = focusedThreadImage;
+	}
+
+	public String getLoadingThreadStatus() {
+		return loadingThreadStatus;
+	}
+
+	public void setLoadingThreadStatus(String loadingThreadStatus) {
+		this.loadingThreadStatus = loadingThreadStatus;
+	}
+
+	public Program getProgram() {
+		return program;
+	}
+
+	public void setProgram(Program program) {
+		this.program = program;
+	}
+
+	public RedditBoardBuilder getRb() {
+		return rb;
+	}
+
+	public void setRb(RedditBoardBuilder rb) {
+		this.rb = rb;
+	}
+
+	public BufferedImageController getBi() {
+		return bi;
+	}
+
+	public void setBi(BufferedImageController bi) {
+		this.bi = bi;
+	}
+
+	public QuoteBuilder getQb() {
+		return qb;
+	}
+
+	public void setQb(QuoteBuilder qb) {
+		this.qb = qb;
+	}
+
+	public DrawBuilder getDb() {
+		return db;
+	}
+
+	public void setDb(DrawBuilder db) {
+		this.db = db;
+	}
+
+	public RedditState getCurrentRedditState() {
+		return currentRedditState;
+	}
+
+	public void setCurrentRedditState(RedditState currentRedditState) {
+		this.currentRedditState = currentRedditState;
+	}
+
+	public Rectangle2D getRedditHomeRect() {
+		return redditHomeRect;
+	}
+
+	public void setRedditHomeRect(Rectangle2D redditHomeRect) {
+		this.redditHomeRect = redditHomeRect;
+	}
+
+	public RoundRectangle2D getRedditContainer() {
+		return redditContainer;
+	}
+
+	public void setRedditContainer(RoundRectangle2D redditContainer) {
+		this.redditContainer = redditContainer;
+	}
+
+	public List<Rectangle2D> getIcons() {
+		return icons;
+	}
+
+	public void setIcons(List<Rectangle2D> icons) {
+		this.icons = icons;
+	}
+
+	public List<BufferedImage> getPins() {
+		return pins;
+	}
+
+	public void setPins(List<BufferedImage> pins) {
+		this.pins = pins;
+	}
+
+	public BufferedImage getTemperatureImage() {
+		return temperatureImage;
+	}
+
+	public void setTemperatureImage(BufferedImage temperatureImage) {
+		this.temperatureImage = temperatureImage;
+	}
+
+	public BufferedImage getSummaryImage() {
+		return summaryImage;
+	}
+
+	public void setSummaryImage(BufferedImage summaryImage) {
+		this.summaryImage = summaryImage;
+	}
+
+	public BufferedImage getTimeImage() {
+		return timeImage;
+	}
+
+	public void setTimeImage(BufferedImage timeImage) {
+		this.timeImage = timeImage;
+	}
+
+	public BufferedImage getQuoteImage() {
+		return quoteImage;
+	}
+
+	public void setQuoteImage(BufferedImage quoteImage) {
+		this.quoteImage = quoteImage;
+	}
+
+	public DateFormat getDateFormatTime() {
+		return dateFormatTime;
+	}
+
+	public void setDateFormatTime(DateFormat dateFormatTime) {
+		this.dateFormatTime = dateFormatTime;
+	}
+
+	public DateFormat getDateFormatDate() {
+		return dateFormatDate;
+	}
+
+	public void setDateFormatDate(DateFormat dateFormatDate) {
+		this.dateFormatDate = dateFormatDate;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public int getNumRows() {
+		return numRows;
+	}
+
+	public void setNumRows(int numRows) {
+		this.numRows = numRows;
+	}
+
+	public int getNumCols() {
+		return numCols;
+	}
+
+	public void setNumCols(int numCols) {
+		this.numCols = numCols;
+	}
+
+	public int getTotalNumCols() {
+		return totalNumCols;
+	}
+
+	public void setTotalNumCols(int totalNumCols) {
+		this.totalNumCols = totalNumCols;
+	}
+
+	public String[] getTempArray() {
+		return tempArray;
+	}
+
+	public void setTempArray(String[] tempArray) {
+		this.tempArray = tempArray;
+	}
+
+	public String[] getTempPinnedArray() {
+		return tempPinnedArray;
+	}
+
+	public void setTempPinnedArray(String[] tempPinnedArray) {
+		this.tempPinnedArray = tempPinnedArray;
+	}
+
+	public void setBoxes(List<Rectangle2D> boxes) {
+		this.boxes = boxes;
 	}
 
 }
