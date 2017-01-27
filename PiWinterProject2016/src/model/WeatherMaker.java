@@ -80,7 +80,13 @@ public class WeatherMaker {
 			} else {
 				this.setFeelsLike((double)json.get("apparentTemperature"));
 			}
-			this.setDewPoint((double)json.get("dewPoint"));
+			
+			if (json.get("dewPoint").getClass().equals(Long.class)) {
+				this.setDewPoint(((Long)json.get("dewPoint")).doubleValue());
+			} else {
+				this.setDewPoint((double)json.get("dewPoint"));
+			}
+			
 			this.setHumidity((double)json.get("humidity"));
 			
 			if (json.get("windSpeed").getClass().equals(Long.class)) {

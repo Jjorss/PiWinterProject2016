@@ -20,6 +20,8 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import org.jsoup.nodes.Element;
+
 import model.DrawBuilder;
 import model.QuoteBuilder;
 import model.RedditBoardBuilder;
@@ -74,6 +76,8 @@ public class UiController {
 	private DateFormat dateFormatTime;
 	private DateFormat dateFormatDate;
 	private Date date;
+	
+	private SwingWorker<Integer, String> redditWorker;
 	
 	private int numRows;
 	private int numCols;
@@ -221,46 +225,52 @@ public class UiController {
 		this.numRows = 3;
 		this.numCols = 3;
 		this.rb = new RedditBoardBuilder(this, subReddit);
-		this.rb.execute();
+		//this.rb.execute();
 		
-//		SwingWorker<Integer, String> worker = new SwingWorker<Integer, String>() {
-//
-//			@Override
-//			protected Integer doInBackground() throws Exception {
-//				currentRedditState = RedditState.Loading;
-//				System.out.println("switched to reddit state: " + currentRedditState);
-//				rb.getData(subReddit);
-//				return 1;
-//			}
-//			@Override
-//			 public void done() {
-//				totalNumCols = rb.getThreads().size() / 3;
-//				for(int i = 0; i < totalNumCols; i++) {
-//					for(int j = 0; j < numCols; j++) {
-//						boxes.add(new Rectangle2D.Double(contentBox.getX() + ((contentBox.getWidth()/numRows) * i),
-//								contentBox.getY() + ((contentBox.getHeight()/numCols) * j),
-//								contentBox.getWidth()/numCols,
-//								contentBox.getHeight()/numRows));
-//					}
-//				}		
-//				int width = (int)(boxes.get(0).getWidth()*0.7);
-//				for (int i = 0; i < rb.getThreads().size(); i++) {
-//					bi.makeThread(program.getGraphics(), (Graphics2D)program.getGraphics(),
-//							rb.getThreads().get(i).getTitle(),
-//							rb.getThreads().get(i).getComments(),
-//							width,
-//							rb.getThreads().get(i).getImage());
-//				}
-//				currentRedditState = RedditState.Page;
-//				System.out.println("switched to reddit state: " + currentRedditState);
-//			}
-//			@Override
-//			protected void process(List<String> chunks) {
-//			    // Messages received from the doInBackground() (when invoking the publish() method)
-//			}
-//			
-//		};
-//		worker.execute();
+		redditWorker = new SwingWorker<Integer, String>() {
+
+			@Override
+			protected Integer doInBackground() throws Exception {
+				currentRedditState = RedditState.Loading;
+				System.out.println("switched to reddit state: " + currentRedditState);
+				rb.getData(subReddit);
+				int index = 0;
+				for (Element thread : rb.getPulledThreads()) {
+					rb.makeThreads(thread);
+					this.setProgress((int)(((double)index/(double)rb.getPulledThreads().size())*100));
+					index++;
+				}
+				return 1;
+			}
+			@Override
+			 public void done() {
+				totalNumCols = rb.getThreads().size() / 3;
+				for(int i = 0; i < totalNumCols; i++) {
+					for(int j = 0; j < numCols; j++) {
+						boxes.add(new Rectangle2D.Double(contentBox.getX() + ((contentBox.getWidth()/numRows) * i),
+								contentBox.getY() + ((contentBox.getHeight()/numCols) * j),
+								contentBox.getWidth()/numCols,
+								contentBox.getHeight()/numRows));
+					}
+				}		
+				int width = (int)(boxes.get(0).getWidth()*0.7);
+				for (int i = 0; i < rb.getThreads().size(); i++) {
+					bi.makeThread(program.getGraphics(), (Graphics2D)program.getGraphics(),
+							rb.getThreads().get(i).getTitle(),
+							rb.getThreads().get(i).getComments(),
+							width,
+							rb.getThreads().get(i).getImage());
+				}
+				currentRedditState = RedditState.Page;
+				System.out.println("switched to reddit state: " + currentRedditState);
+			}
+			@Override
+			protected void process(List<String> chunks) {
+			    // Messages received from the doInBackground() (when invoking the publish() method)
+			}
+			
+		};
+		redditWorker.execute();
 		
 	}
 	
@@ -419,7 +429,7 @@ public class UiController {
 	public void renderRedditLoading(Graphics2D g2) {
 		g2.setFont(new Font("Arial", Font.BOLD, (int)(this.contentBox.getHeight()*0.1)));
 		g2.setColor(Color.WHITE);
-		g2.drawString(this.rb.getProgress()+"%",
+		g2.drawString(this.redditWorker.getProgress()+"%",
 				(int)this.contentBox.getWidth()/2, (int)this.contentBox.getHeight()/2);
 		
 	}
