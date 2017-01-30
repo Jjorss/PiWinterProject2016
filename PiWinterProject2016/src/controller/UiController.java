@@ -41,6 +41,7 @@ public class UiController {
 	private DrawBuilder db;
 	private State currentState = State.LOADING;
 	private RedditState currentRedditState = RedditState.Home;
+	private PinController pinC = new PinController();
 	
 	private Rectangle2D sideBar;
 	private Rectangle2D contentBox;
@@ -55,6 +56,8 @@ public class UiController {
 	// reddit rectangles
 	private Rectangle2D redditHomeRect;
 	private RoundRectangle2D redditContainer;
+	private Rectangle2D redditAddPin;
+	private Rectangle2D redditHomeRectBottome;
 	
 	private List<Rectangle2D> boxes = new ArrayList<Rectangle2D>();
 	private List<Rectangle2D> iconBoxes = new ArrayList<Rectangle2D>();
@@ -72,6 +75,7 @@ public class UiController {
 	private BufferedImage timeImage;
 	private BufferedImage quoteImage;
 	private BufferedImage focusedThreadImage;
+	//private BufferedImage homeIcon; 
 	
 	private DateFormat dateFormatTime;
 	private DateFormat dateFormatDate;
@@ -213,6 +217,22 @@ public class UiController {
 				redditContainerHeight,
 				50,
 				50);
+		redditHomeRectBottome = new Rectangle2D.Double(
+				this.redditHomeRect.getX(),
+				redditHomeRect.getY() + redditHomeRect.getHeight(),
+				redditHomeRect.getWidth(),
+				(this.contentBox.getY() + this.contentBox.getHeight()) - (redditHomeRect.getY() + redditHomeRect.getHeight()));
+				
+		double redditAddPinWidth = this.contentBox.getWidth()*0.2;
+		double redditAddPinHeight = this.contentBox.getHeight()*0.1;
+		redditAddPin = new Rectangle2D.Double(
+				(this.redditHomeRectBottome.getX() + (this.redditHomeRectBottome.getWidth()/2)) - (redditAddPinWidth/2),
+				(this.redditHomeRectBottome.getY() + (this.redditHomeRectBottome.getHeight()/2)) - (redditAddPinHeight/2),
+				redditAddPinWidth,
+				redditAddPinHeight);
+		
+		//homeIcon = bi.createHomeIcon();
+		bi.loadSideBarIcons();
 		
 		System.out.println("Initialized");		
 		this.currentState = State.HOME;
@@ -315,7 +335,7 @@ public class UiController {
 		case HOME:
 			this.renderSideBar(g2);
 			this.renderContentBox(g2);
-			this.renderIconsBoxes(g2);
+			//this.renderIconsBoxes(g2);
 			this.renderIcons(g2);
 			this.renderWetherRect(g2);
 			this.renderTime(g2);
@@ -354,13 +374,13 @@ public class UiController {
 			}
 			
 			this.renderSideBar(g2);
-			this.renderIconsBoxes(g2);
+			//this.renderIconsBoxes(g2);
 			this.renderIcons(g2);
 			break;
 		case DRAW:
 			this.renderContentBox(g2);
 			this.renderSideBar(g2);
-			this.renderIconsBoxes(g2);
+			//this.renderIconsBoxes(g2);
 			this.renderIcons(g2);
 			this.renderDrawing(g2);
 			break;
@@ -408,7 +428,9 @@ public class UiController {
 			g2.draw(pinned);
 			//g2.fill(pinned);
 		}
-		
+		g2.fill(redditHomeRectBottome);
+		g2.setColor(Color.GREEN);
+		g2.fill(redditAddPin);
 	}
 	
 	public void renderPinnedSubs(Graphics2D g2) {
@@ -424,6 +446,7 @@ public class UiController {
 					program);
 			index++;
 		}
+		
 	}
 	
 	public void renderRedditLoading(Graphics2D g2) {
@@ -485,7 +508,7 @@ public class UiController {
 	
 	public void renderDisplay(Graphics2D g2) {
 		g2.setColor(Color.RED);
-		g2.draw(this.displayRect);
+		//g2.draw(this.displayRect);
 		g2.drawImage(this.quoteImage,
 				(int)(this.displayRect.getX() + (this.displayRect.getWidth()/2)) - (this.quoteImage.getWidth()/2),
 				(int)(this.displayRect.getY() + (this.displayRect.getHeight()/2)) - (this.quoteImage.getHeight()/2),
@@ -506,7 +529,7 @@ public class UiController {
 	
 	public void renderTime(Graphics2D g2) {
 		g2.setColor(Color.RED);
-		g2.draw(timeRect);
+		//g2.draw(timeRect);
 		g2.drawImage(this.timeImage,
 				(int)(this.timeRect.getX() + (this.timeRect.getWidth()/2)) - (this.timeImage.getWidth()/2),
 				(int)(this.timeRect.getY() + (this.timeRect.getHeight()/2)) - (this.timeImage.getHeight()/2),
@@ -517,11 +540,11 @@ public class UiController {
 	
 	public void renderWetherRect(Graphics2D g2) {
 		g2.setColor(Color.RED);
-		g2.draw(weatherRect);
-		g2.draw(tempRect);
-		g2.draw(weatherDataRect);
-		g2.draw(weatherSummaryRect);
-		g2.draw(weatherIconRect);
+		//g2.draw(weatherRect);
+		//g2.draw(tempRect);
+		//g2.draw(weatherDataRect);
+		//g2.draw(weatherSummaryRect);
+		//g2.draw(weatherIconRect);
 		g2.setColor(Color.WHITE);
 		g2.setFont(new Font("Arial", Font.BOLD, 50));
 		g2.drawImage(this.temperatureImage,
@@ -584,10 +607,24 @@ public class UiController {
 		g2.setFont(new Font("Arial", Font.BOLD, 50));
 		int index = 0;
 		for (Rectangle2D icon : icons) {
-			g2.fill(icon);
-			g2.setColor(Color.white);
-			g2.drawString(tempArray[index], (float)icon.getCenterX(), (float)icon.getCenterY());
-			g2.setColor(Color.black);
+			// temp
+			if (index == 0) {
+				//g2.setColor(Color.WHITE);
+				//g2.draw(icon);
+				g2.drawImage(bi.getSideBarIcons().get(0), (int)icon.getX(),
+						(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
+				
+			} else if (index == 1){ 
+				g2.drawImage(bi.getSideBarIcons().get(1), (int)icon.getX(),
+						(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
+		    }else {
+				g2.setColor(Color.BLACK);
+				g2.fill(icon);
+				g2.setColor(Color.white);
+				g2.drawString(tempArray[index], (float)icon.getCenterX(), (float)icon.getCenterY());
+				g2.setColor(Color.black);
+			}
+			
 			index++;
 		}
 		
@@ -635,6 +672,11 @@ public class UiController {
 				switch(this.currentRedditState) {
 				case Home:
 					this.handleGoToSubReddit(p);
+					if (this.redditAddPin.contains(p)) {
+						this.handleClickedAddPin();
+					} else {
+						this.handleGoToSubReddit(p);
+					}
 					break;
 				case Loading:
 					break;
@@ -654,6 +696,10 @@ public class UiController {
 			
 			}	
 		}
+	}
+	
+	public void handleClickedAddPin() {
+		this.pinC.addNewPin(null);
 	}
 	
 	public void handleGoToSubReddit(Point p) {

@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -19,11 +21,40 @@ public class BufferedImageController {
 	private Program p;
 	private UiController ui;
 	
+	private String[] sideBarPaths = new String[]{"home.png","reddit.png"};
+	private List<BufferedImage> sideBarIcons = new ArrayList<BufferedImage>();
+	
 	public BufferedImageController(Program p, UiController ui){
 		this.p = p;
 		this.ui = ui;
 	}
 
+	public void loadSideBarIcons() {
+		BufferedImage bi = null;
+		for(String path : sideBarPaths) {
+			try {
+				URL url = BufferedImageController.class.getResource(
+						 "/sideBar/" + path);
+				bi = ImageIO.read(url);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			this.sideBarIcons.add(bi);
+		}
+	}
+	
+	public BufferedImage createHomeIcon() {
+		BufferedImage bi = null;
+		try {
+			URL url = BufferedImageController.class.getResource(
+					 "/sideBar/home.png");
+			bi = ImageIO.read(url);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return bi;
+	}
+	
 	public BufferedImage createWeatherIcon(String icon) {
 		BufferedImage bi = null;
 		int rowSize = 6;
@@ -431,6 +462,14 @@ public class BufferedImageController {
 			}
 		}
 		return new Resolution(newWidth, newHeight);
+	}
+
+	public List<BufferedImage> getSideBarIcons() {
+		return sideBarIcons;
+	}
+
+	public void setSideBarIcons(List<BufferedImage> sideBarIcons) {
+		this.sideBarIcons = sideBarIcons;
 	}
 	
 }
