@@ -21,8 +21,10 @@ public class BufferedImageController {
 	private Program p;
 	private UiController ui;
 	
-	private String[] sideBarPaths = new String[]{"home.png","reddit.png"};
+	private String[] sideBarPaths = new String[]{"home.png","reddit.png", "draw.png", "calendar.png", "question_mark.png"};
 	private List<BufferedImage> sideBarIcons = new ArrayList<BufferedImage>();
+	
+	private int homeAlpha = 170;
 	
 	public BufferedImageController(Program p, UiController ui){
 		this.p = p;
@@ -217,7 +219,7 @@ public class BufferedImageController {
             d.height,
             BufferedImage.TYPE_INT_ARGB);
         g = bi.createGraphics();
-        g.setColor(new Color(255, 255, 255, 128));
+        g.setColor(new Color(255, 255, 255, homeAlpha));
         g.fillRoundRect(
             0,
             0,
@@ -260,7 +262,7 @@ public class BufferedImageController {
             d.height,
             BufferedImage.TYPE_INT_ARGB);
         g = bi.createGraphics();
-        g.setColor(new Color(255, 255, 255, 128));
+        g.setColor(new Color(255, 255, 255, homeAlpha));
         g.fillRoundRect(
             0,
             0,
@@ -299,7 +301,7 @@ public class BufferedImageController {
             d.height,
             BufferedImage.TYPE_INT_ARGB);
         g = bi.createGraphics();
-        g.setColor(new Color(255, 255, 255, 128));
+        g.setColor(new Color(255, 255, 255, homeAlpha));
         g.fillRoundRect(
             0,
             0,
@@ -338,7 +340,7 @@ public class BufferedImageController {
             d.height,
             BufferedImage.TYPE_INT_ARGB);
         g = bi.createGraphics();
-        g.setColor(new Color(255, 255, 255, 128));
+        g.setColor(new Color(255, 255, 255, homeAlpha));
         g.fillRoundRect(
             0,
             0,
@@ -377,7 +379,7 @@ public class BufferedImageController {
             d.height,
             BufferedImage.TYPE_INT_ARGB);
         g = bi.createGraphics();
-        g.setColor(new Color(255, 255, 255, 128));
+        g.setColor(new Color(255, 255, 255, homeAlpha));
         g.fillRoundRect(
             0,
             0,
@@ -395,6 +397,44 @@ public class BufferedImageController {
 	
 	public BufferedImage makePin(Graphics g, Graphics2D g2, String title){
 		int size = (int)(ui.getPinnedGrid().get(0).getWidth()*0.05);
+		int padding = (int)(ui.getPinnedGrid().get(0).getWidth() * 0.01);
+		String string = "<html><body style='padding: "+ padding +"px;'>"
+                + "<h1 style='font-size:" + size + "px; text-align: center;'>"  + title + "</h1>"
+                + "</body></html>";
+				
+		
+		
+		JLabel textLabel = new JLabel(string);
+		textLabel.setSize(new Dimension(
+				(int)(ui.getPinnedGrid().get(0).getWidth()*0.95),
+				(int)(ui.getPinnedGrid().get(0).getHeight()*0.95)));
+
+
+        Dimension d = textLabel.getSize();
+
+        BufferedImage bi = new BufferedImage(
+            d.width,
+            d.height,
+            BufferedImage.TYPE_INT_ARGB);
+        g = bi.createGraphics();
+        g.setColor(new Color(255, 255, 255, 128));
+        g.fillRoundRect(
+            0,
+            0,
+            bi.getWidth(p),
+            bi.getHeight(p),
+            15,
+            10);
+        g.setColor(Color.black);
+        
+        textLabel.paint(g);
+
+        return bi;
+        
+	}
+	
+	public BufferedImage makeDrawClearButton(Graphics g, Graphics2D g2, String title){
+		int size = (int)(ui.getContentBox().getWidth()*0.1);
 		int padding = (int)(ui.getPinnedGrid().get(0).getWidth() * 0.01);
 		String string = "<html><body style='padding: "+ padding +"px;'>"
                 + "<h1 style='font-size:" + size + "px; text-align: center;'>"  + title + "</h1>"
@@ -470,6 +510,10 @@ public class BufferedImageController {
 
 	public void setSideBarIcons(List<BufferedImage> sideBarIcons) {
 		this.sideBarIcons = sideBarIcons;
+	}
+
+	public int getHomeAlpha() {
+		return homeAlpha;
 	}
 	
 }

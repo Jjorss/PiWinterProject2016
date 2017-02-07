@@ -75,6 +75,7 @@ public class UiController {
 	private BufferedImage timeImage;
 	private BufferedImage quoteImage;
 	private BufferedImage focusedThreadImage;
+	private BufferedImage drawClearImage;
 	//private BufferedImage homeIcon; 
 	
 	private DateFormat dateFormatTime;
@@ -231,6 +232,10 @@ public class UiController {
 				redditAddPinWidth,
 				redditAddPinHeight);
 		
+		drawClearImage = bi.makeDrawClearButton(
+				program.getGraphics(), (Graphics2D)program.getGraphics(), "Clear");
+		
+		
 		//homeIcon = bi.createHomeIcon();
 		bi.loadSideBarIcons();
 		
@@ -383,11 +388,21 @@ public class UiController {
 			//this.renderIconsBoxes(g2);
 			this.renderIcons(g2);
 			this.renderDrawing(g2);
+			this.renderDrawClearButton(g2);
 			break;
 		default:
 			break;
 		}
 	
+	}
+	
+	public void renderDrawClearButton(Graphics2D g2) {
+		g2.drawImage(this.drawClearImage,
+				(int)this.contentBox.getX(),
+				(int)this.contentBox.getY(),
+				(int)(this.contentBox.getWidth()*0.1),
+				(int)(this.contentBox.getHeight()*0.1),
+				program);
 	}
 	
 	public void renderRedditImage(Graphics2D g2) {
@@ -565,7 +580,7 @@ public class UiController {
 				(int)this.summaryImage.getWidth(),
 				(int)this.summaryImage.getHeight(),
 				program);
-		g2.setColor(new Color(255, 255, 255, 128));
+		g2.setColor(new Color(255, 255, 255, bi.getHomeAlpha()));
 		int iconWidth = (int)(this.weatherIconRect.getWidth() * 0.95);
 		int iconHeight = (int)(this.weatherIconRect.getHeight() * 0.95);
         g2.fillRoundRect(
@@ -607,23 +622,26 @@ public class UiController {
 		g2.setFont(new Font("Arial", Font.BOLD, 50));
 		int index = 0;
 		for (Rectangle2D icon : icons) {
+			
+			g2.drawImage(bi.getSideBarIcons().get(index), (int)icon.getX(),
+					(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
 			// temp
-			if (index == 0) {
-				//g2.setColor(Color.WHITE);
-				//g2.draw(icon);
-				g2.drawImage(bi.getSideBarIcons().get(0), (int)icon.getX(),
-						(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
-				
-			} else if (index == 1){ 
-				g2.drawImage(bi.getSideBarIcons().get(1), (int)icon.getX(),
-						(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
-		    }else {
-				g2.setColor(Color.BLACK);
-				g2.fill(icon);
-				g2.setColor(Color.white);
-				g2.drawString(tempArray[index], (float)icon.getCenterX(), (float)icon.getCenterY());
-				g2.setColor(Color.black);
-			}
+//			if (index == 0) {
+//				//g2.setColor(Color.WHITE);
+//				//g2.draw(icon);
+//				g2.drawImage(bi.getSideBarIcons().get(0), (int)icon.getX(),
+//						(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
+//				
+//			} else if (index == 1){ 
+//				g2.drawImage(bi.getSideBarIcons().get(1), (int)icon.getX(),
+//						(int)icon.getY(), (int)icon.getWidth(), (int)icon.getHeight(), program);
+//		    }else {
+//				g2.setColor(Color.BLACK);
+//				g2.fill(icon);
+//				g2.setColor(Color.white);
+//				g2.drawString(tempArray[index], (float)icon.getCenterX(), (float)icon.getCenterY());
+//				g2.setColor(Color.black);
+//			}
 			
 			index++;
 		}
@@ -637,7 +655,7 @@ public class UiController {
 	}
 	
 	public void renderContentBox(Graphics2D g2) {
-		g2.setColor(Color.LIGHT_GRAY);
+		g2.setColor(new Color(94,132, 205));
 		g2.draw(contentBox);
 		g2.fill(contentBox);
 	}
