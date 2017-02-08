@@ -35,6 +35,8 @@ public class Program extends JPanel{
 		@Override
 		public void mousePressed(MouseEvent e) {
 			setSourcePoint(e.getPoint());
+			ui.getDb().handleDraw(e.getPoint(), true);
+			
 		}
 		@Override
 		public void mouseClicked(MouseEvent e) {

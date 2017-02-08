@@ -455,7 +455,7 @@ public class BufferedImageController {
             d.height,
             BufferedImage.TYPE_INT_ARGB);
         g = bi.createGraphics();
-        g.setColor(new Color(255, 255, 255, 128));
+        g.setColor(new Color(200, 200, 200, 128));
         g.fillRoundRect(
             0,
             0,

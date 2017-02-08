@@ -25,11 +25,11 @@ public class DrawBuilder {
 				p2.getY()));//new y
 	}
 	
-	public void handleDraw(Point p) {		
-		if(this.pixels.size() > 1) {
-			this.createPixel( this.pixels.get(this.pixels.size()-1).getP2(), p);
-		} else {
+	public void handleDraw(Point p, boolean createNewPoint) {		
+		if(createNewPoint) {
 			this.createPixel( p, p);
+		} else {
+			this.createPixel( this.pixels.get(this.pixels.size()-1).getP2(), p);
 		}
 		
 	}
@@ -57,6 +57,8 @@ public class DrawBuilder {
 	public void setColor(Color color) {
 		this.color = color;
 	}
+
+	
 
 	
 }

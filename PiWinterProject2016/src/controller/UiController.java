@@ -58,6 +58,8 @@ public class UiController {
 	private RoundRectangle2D redditContainer;
 	private Rectangle2D redditAddPin;
 	private Rectangle2D redditHomeRectBottome;
+	// draw rectangles
+	private Rectangle2D drawClearBox;
 	
 	private List<Rectangle2D> boxes = new ArrayList<Rectangle2D>();
 	private List<Rectangle2D> iconBoxes = new ArrayList<Rectangle2D>();
@@ -234,6 +236,11 @@ public class UiController {
 		
 		drawClearImage = bi.makeDrawClearButton(
 				program.getGraphics(), (Graphics2D)program.getGraphics(), "Clear");
+		drawClearBox = new Rectangle2D.Double(
+				(int)this.contentBox.getX(),
+				(int)this.contentBox.getY(),
+				(int)(this.contentBox.getWidth()*0.1),
+				(int)(this.contentBox.getHeight()*0.1));
 		
 		
 		//homeIcon = bi.createHomeIcon();
@@ -384,10 +391,10 @@ public class UiController {
 			break;
 		case DRAW:
 			this.renderContentBox(g2);
+			this.renderDrawing(g2);
 			this.renderSideBar(g2);
 			//this.renderIconsBoxes(g2);
 			this.renderIcons(g2);
-			this.renderDrawing(g2);
 			this.renderDrawClearButton(g2);
 			break;
 		default:
@@ -655,12 +662,28 @@ public class UiController {
 	}
 	
 	public void renderContentBox(Graphics2D g2) {
-		g2.setColor(new Color(94,132, 205));
+		
+		switch(this.currentState) {
+		case DRAW:
+			g2.setColor(new Color(255, 255, 255));
+			break;
+		case HOME:
+			g2.setColor(new Color(94, 132, 205));
+			break;
+		case LOADING:
+			break;
+		case REDDIT:
+			g2.setColor(new Color(255, 69, 0));
+			break;
+		default:
+			break;
+		
+		}
 		g2.draw(contentBox);
 		g2.fill(contentBox);
 	}
 
-	
+	// should be a switch statement
 	public void handleDrag(Point p) {
 		if (this.currentState == State.REDDIT) {
 			if(p.getX() < program.getSourcePoint().getX()) {
@@ -670,8 +693,12 @@ public class UiController {
 			}
 		}
 		if(this.currentState == State.DRAW) {
-			db.handleDraw(p);
+			db.handleDraw(p, false);
 		}
+	}
+	
+	public void handleClear() {
+		this.db.getPixels().clear();
 	}
 	
 	public void handleOnClick(Point p) {
@@ -681,6 +708,9 @@ public class UiController {
 		if (this.contentBox.contains(p)) {
 			switch(this.currentState) {
 			case DRAW:
+				if (this.drawClearBox.contains(p)) {
+					this.handleClear();
+				}
 				break;
 			case HOME:
 				break;
