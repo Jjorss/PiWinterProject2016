@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import controller.UiController;
+import model.DrawState;
 
 public class Program extends JPanel{
 	
@@ -24,23 +25,27 @@ public class Program extends JPanel{
 	private static final int WIDTH = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 	private static final int HEIGHT = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private UiController ui = new UiController(this);
-	private Point sourcePoint;
+	private Point sourcePoint = null;
 	
 	 MouseAdapter ma = new MouseAdapter() {
 		@Override
         public void mouseReleased(MouseEvent e) {
-           
-            
+           if (ui.getDb().getCurrentState() == DrawState.DRAW) {
+        	   ui.getDb().setCurrentState(DrawState.END);
+           }
+            System.out.println("Moused Released!");
         }
 		@Override
 		public void mousePressed(MouseEvent e) {
 			setSourcePoint(e.getPoint());
-			ui.getDb().handleDraw(e.getPoint(), true);
-			
+			ui.getDb().setCurrentState(DrawState.START);
+			ui.getDb().handleDraw(e.getPoint());
+			System.out.println("Moused Pressed !");
 		}
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			ui.handleOnClick(e.getPoint());
+			System.out.println("Mouse Clicked !");
 		}
 	
 	};
@@ -50,6 +55,10 @@ public class Program extends JPanel{
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			ui.handleDrag(e.getPoint());
+			if (ui.getDb().getCurrentState() == DrawState.START) {
+				ui.getDb().setCurrentState(DrawState.DRAW);
+			}
+			System.out.println("Moused Dragged!");
 			 ActionListener getSource = new ActionListener() {
 		            public void actionPerformed(ActionEvent evt) {
 		                setSourcePoint(e.getPoint());
@@ -127,7 +136,7 @@ public class Program extends JPanel{
 	
 	public void loop() {
 		long lastLoopTime = System.nanoTime();
-		final int TARGET_FPS = 60;
+		final int TARGET_FPS = 20;
 		final long OPTIMAL_TIME = 1000000000 / TARGET_FPS; 
 		long lastFpsTime = 0;
 		int fps = 0;   

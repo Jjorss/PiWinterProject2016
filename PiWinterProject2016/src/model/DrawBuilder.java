@@ -12,6 +12,7 @@ public class DrawBuilder {
 	private List<Line2D> pixels = new ArrayList<Line2D>();
 	private int thickness = 5;
 	private Color color = Color.RED;
+	private DrawState currentState = DrawState.START;
 	
 	public DrawBuilder() {
 		
@@ -25,13 +26,21 @@ public class DrawBuilder {
 				p2.getY()));//new y
 	}
 	
-	public void handleDraw(Point p, boolean createNewPoint) {		
-		if(createNewPoint) {
-			this.createPixel( p, p);
-		} else {
+	public void handleDraw(Point p) {		
+		switch(this.currentState) {
+		case DRAW:
 			this.createPixel( this.pixels.get(this.pixels.size()-1).getP2(), p);
-		}
+			break;
+		case END:
+			break;
+		case START:
+			this.createPixel(p, p);
+			break;
+		default:
+			break;
 		
+		}
+
 	}
 	
 	public void eraseAll() {
@@ -56,6 +65,14 @@ public class DrawBuilder {
 
 	public void setColor(Color color) {
 		this.color = color;
+	}
+
+	public DrawState getCurrentState() {
+		return currentState;
+	}
+
+	public void setCurrentState(DrawState currentState) {
+		this.currentState = currentState;
 	}
 
 	

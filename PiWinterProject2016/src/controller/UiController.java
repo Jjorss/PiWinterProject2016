@@ -693,7 +693,7 @@ public class UiController {
 			}
 		}
 		if(this.currentState == State.DRAW) {
-			db.handleDraw(p, false);
+			db.handleDraw(p);
 		}
 	}
 	
