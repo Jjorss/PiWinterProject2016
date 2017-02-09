@@ -17,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.SwingWorker;
 
@@ -95,6 +97,9 @@ public class UiController {
 	private String[] tempPinnedArray = new String[]{"r/elderscrollsonline/", "Reddit", "r/frugalmalefashion/"};
 	
 	private String loadingThreadStatus = "0%";
+	
+	private Timer timerWeather = new Timer();
+	
 	
 	public UiController(Program program){
 		this.program = program;
@@ -185,7 +190,7 @@ public class UiController {
 				, qb.getDailyQuotes(), qb.getAuthor());
 		
 		db = new DrawBuilder();
-		dateFormatTime = new SimpleDateFormat("HH:mm:ss");
+		dateFormatTime = new SimpleDateFormat("hh:mm:ss");
 		dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
 		date = new Date();
 		//System.out.println(dateFormat.format(date)); //2016/11/16 12:08:43
@@ -242,8 +247,15 @@ public class UiController {
 				(int)(this.contentBox.getWidth()*0.1),
 				(int)(this.contentBox.getHeight()*0.1));
 		
+		timerWeather.scheduleAtFixedRate(new TimerTask() {
+			  @Override
+			  public void run() {
+			    weather.getData();
+			    System.out.println("Pulling weather data");
+			  }
+			}, 0, 60*60*1000);
 		
-		//homeIcon = bi.createHomeIcon();
+		
 		bi.loadSideBarIcons();
 		
 		System.out.println("Initialized");		
@@ -316,6 +328,11 @@ public class UiController {
 			date = new Date();
 			this.timeImage = bi.makeTime(program.getGraphics(), (Graphics2D)program.getGraphics(),
 					dateFormatTime.format(date), dateFormatDate.format(date));
+			String d = dateFormatTime.format(date);
+			Integer time = Integer.parseInt(d.substring(0, 2));
+			if (time == 3) {
+				this.qb.getData();
+			} 
 			break;
 		case REDDIT:
 			break;

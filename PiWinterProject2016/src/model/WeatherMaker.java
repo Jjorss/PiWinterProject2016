@@ -25,7 +25,7 @@ public class WeatherMaker {
 	private double windSpeed = 0;
 	private String summary = "";
 	private String hourlySummary = "";
-	private long nearestStormDistance = 0;
+	private double nearestStormDistance = 0;
 	private String icon = "";
 	private BufferedImageController bi;
 	private BufferedImage weatherImage;
@@ -94,7 +94,13 @@ public class WeatherMaker {
 			} else {
 				this.setWindSpeed((double)json.get("windSpeed"));
 			}
-			this.setNearestStormDistance((long)json.get("nearestStormDistance"));
+			
+			if (json.get("nearestStormDistance").getClass().equals(Long.class)) {
+				this.setNearestStormDistance(((Long) json.get("nearestStormDistance")).doubleValue());
+			} else {
+				this.setNearestStormDistance((double)json.get("nearestStormDistance"));
+			}
+			
 			this.setIcon((String)json.get("icon"));
 			//hourly = (JSONObject) hourly.get("summary");
 			System.out.println(json);
@@ -213,7 +219,7 @@ public class WeatherMaker {
 		return nearestStormDistance;
 	}
 
-	public void setNearestStormDistance(long nearestStormDistance) {
+	public void setNearestStormDistance(double nearestStormDistance) {
 		this.nearestStormDistance = nearestStormDistance;
 	}
 
