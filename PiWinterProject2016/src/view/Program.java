@@ -18,6 +18,7 @@ import javax.swing.Timer;
 
 import controller.UiController;
 import model.DrawState;
+import model.State;
 
 public class Program extends JPanel{
 	
@@ -30,7 +31,8 @@ public class Program extends JPanel{
 	 MouseAdapter ma = new MouseAdapter() {
 		@Override
         public void mouseReleased(MouseEvent e) {
-           if (ui.getDb().getCurrentState() == DrawState.DRAW) {
+           if (ui.getCurrentState() == State.DRAW && 
+        		   ui.getDb().getCurrentState() == DrawState.DRAW) {
         	   ui.getDb().setCurrentState(DrawState.END);
            }
             System.out.println("Moused Released!");
@@ -38,9 +40,12 @@ public class Program extends JPanel{
 		@Override
 		public void mousePressed(MouseEvent e) {
 			setSourcePoint(e.getPoint());
-			ui.getDb().setCurrentState(DrawState.START);
-			ui.getDb().handleDraw(e.getPoint());
-			System.out.println("Moused Pressed !");
+			if (ui.getCurrentState() == State.DRAW) {
+				ui.getDb().setCurrentState(DrawState.START);
+				ui.getDb().handleDraw(e.getPoint());
+				System.out.println("Moused Pressed !");
+			}
+			
 		}
 		@Override
 		public void mouseClicked(MouseEvent e) {

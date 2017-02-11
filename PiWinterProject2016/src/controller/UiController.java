@@ -144,35 +144,9 @@ public class UiController {
 				this.weatherRect.getHeight()*0.5);
 		
 		weather = new WeatherMaker(bi);
-		weather.getData();
-		temperatureImage = bi.makeTemperature(program.getGraphics(),
-				(Graphics2D)program.getGraphics(), ""+weather.getTemperature(),
-				"" + weather.getFeelsLike());
-		weatherDataRect = new Rectangle2D.Double(
-				tempRect.getX() + tempRect.getWidth(),
-				weatherRect.getY(),
-				weatherRect.getWidth()*0.5,
-				weatherRect.getHeight() * 0.6);
+		this.initWeather(weather);
 		
-		weatherDataImage = bi.makeWeatherData(program.getGraphics(), (Graphics2D)program.getGraphics(),
-				this.weather.getPrecipProbability() + "",
-				this.weather.getDewPoint() + "",
-				this.weather.getHumidity() + "",
-				this.weather.getWindSpeed() + "",
-				this.weather.getNearestStormDistance()+ "");
-		weatherSummaryRect = new Rectangle2D.Double(this.weatherRect.getX(),
-				this.weatherRect.getY() + this.tempRect.getHeight(),
-				this.weatherRect.getWidth()/2,
-				this.weatherRect.getHeight() - this.tempRect.getHeight());
-		summaryImage = bi.makeWeatherSummary(program.getGraphics(), 
-				(Graphics2D)program.getGraphics(), 
-				this.weather.getSummary(),
-				this.weather.getHourlySummary());
-		weatherIconRect = new Rectangle2D.Double(
-				this.weatherSummaryRect.getX() + this.weatherSummaryRect.getWidth(),
-				this.weatherDataRect.getY() + this.weatherDataRect.getHeight(),
-				this.weatherRect.getWidth() - this.weatherSummaryRect.getWidth(),
-				this.weatherRect.getHeight() - this.weatherDataRect.getHeight());
+		
 		timeRect = new Rectangle2D.Double(
 				this.contentBox.getX(),
 				this.contentBox.getY(),
@@ -250,7 +224,7 @@ public class UiController {
 		timerWeather.scheduleAtFixedRate(new TimerTask() {
 			  @Override
 			  public void run() {
-			    weather.getData();
+			    initWeather(weather);
 			    System.out.println("Pulling weather data");
 			  }
 			}, 0, 60*60*1000);
@@ -261,6 +235,38 @@ public class UiController {
 		System.out.println("Initialized");		
 		this.currentState = State.HOME;
 		
+	}
+	
+	public void initWeather(WeatherMaker weather) {
+		weather.getData();
+		temperatureImage = bi.makeTemperature(program.getGraphics(),
+				(Graphics2D)program.getGraphics(), ""+weather.getTemperature(),
+				"" + weather.getFeelsLike());
+		weatherDataRect = new Rectangle2D.Double(
+				tempRect.getX() + tempRect.getWidth(),
+				weatherRect.getY(),
+				weatherRect.getWidth()*0.5,
+				weatherRect.getHeight() * 0.6);
+		
+		weatherDataImage = bi.makeWeatherData(program.getGraphics(), (Graphics2D)program.getGraphics(),
+				this.weather.getPrecipProbability() + "",
+				this.weather.getDewPoint() + "",
+				this.weather.getHumidity() + "",
+				this.weather.getWindSpeed() + "",
+				this.weather.getNearestStormDistance()+ "");
+		weatherSummaryRect = new Rectangle2D.Double(this.weatherRect.getX(),
+				this.weatherRect.getY() + this.tempRect.getHeight(),
+				this.weatherRect.getWidth()/2,
+				this.weatherRect.getHeight() - this.tempRect.getHeight());
+		summaryImage = bi.makeWeatherSummary(program.getGraphics(), 
+				(Graphics2D)program.getGraphics(), 
+				this.weather.getSummary(),
+				this.weather.getHourlySummary());
+		weatherIconRect = new Rectangle2D.Double(
+				this.weatherSummaryRect.getX() + this.weatherSummaryRect.getWidth(),
+				this.weatherDataRect.getY() + this.weatherDataRect.getHeight(),
+				this.weatherRect.getWidth() - this.weatherSummaryRect.getWidth(),
+				this.weatherRect.getHeight() - this.weatherDataRect.getHeight());
 	}
 	
 	public void initSubReddit(String subReddit) {
@@ -332,6 +338,8 @@ public class UiController {
 			Integer time = Integer.parseInt(d.substring(0, 2));
 			if (time == 3) {
 				this.qb.getData();
+				this.quoteImage = bi.makeQuote(program.getGraphics(), (Graphics2D)program.getGraphics()
+						, qb.getDailyQuotes(), qb.getAuthor());
 			} 
 			break;
 		case REDDIT:
@@ -386,7 +394,7 @@ public class UiController {
 			case Page:
 				this.renderContentBox(g2);
 				this.renderThreads(g2, g2);
-				this.renderBoxes(g2);
+				//this.renderBoxes(g2);
 				break;
 			case Image:
 				this.renderContentBox(g2);
@@ -511,32 +519,40 @@ public class UiController {
 			BufferedImage bi = this.posts.get(index);
 			//System.out.println(box.getX());
 			//System.out.println(box.getY());
-			if (this.rb.getThreads().get(index).isShowImage() && this.rb.getThreads().get(index).getImage()!=null) {
-				BufferedImage tn = this.rb.getThreads().get(index).getImage();
-				Resolution res = this.bi.scaleImage(tn.getWidth(),
-						tn.getHeight(),
-						(int)(box.getWidth()*0.9),
-						(int)(box.getHeight()*0.9));
-				int width = res.getWidth();
-				
-				int height = res.getHeight();
-				g2.drawImage(
-						tn,
-						(int)( box.getX() + (box.getWidth()/2) - (width/2) ),
-						(int)(int)( box.getY() + (box.getHeight()/2) - (height/2) ),
-						width,
-						height,
-						program);
-			} else {
-				g2.drawImage(bi,
-						(int)( box.getX() + (box.getWidth()/2) - (bi.getWidth()/2) ),
-						(int)(int)( box.getY() + (box.getHeight()/2) - (bi.getHeight()/2) ),
-						bi.getWidth(),
-						bi.getHeight(),
-						program);
-			}
-			
+			g2.drawImage(bi,
+					(int)( box.getX() + (box.getWidth()/2) - (bi.getWidth()/2) ),
+					(int)(int)( box.getY() + (box.getHeight()/2) - (bi.getHeight()/2) ),
+					bi.getWidth(),
+					bi.getHeight(),
+					program);
 			index++;
+			// old image code
+//			if (this.rb.getThreads().get(index).isShowImage() && this.rb.getThreads().get(index).getImage()!=null) {
+//				BufferedImage tn = this.rb.getThreads().get(index).getImage();
+//				Resolution res = this.bi.scaleImage(tn.getWidth(),
+//						tn.getHeight(),
+//						(int)(box.getWidth()*0.9),
+//						(int)(box.getHeight()*0.9));
+//				int width = res.getWidth();
+//				
+//				int height = res.getHeight();
+//				g2.drawImage(
+//						tn,
+//						(int)( box.getX() + (box.getWidth()/2) - (width/2) ),
+//						(int)(int)( box.getY() + (box.getHeight()/2) - (height/2) ),
+//						width,
+//						height,
+//						program);
+//			} else {
+//				g2.drawImage(bi,
+//						(int)( box.getX() + (box.getWidth()/2) - (bi.getWidth()/2) ),
+//						(int)(int)( box.getY() + (box.getHeight()/2) - (bi.getHeight()/2) ),
+//						bi.getWidth(),
+//						bi.getHeight(),
+//						program);
+//			}
+			
+			
 		}
 		
 	}
@@ -746,10 +762,10 @@ public class UiController {
 				case Loading:
 					break;
 				case Page:
-					this.handleShowImage(p);
+					//this.handleShowImage(p);
 					break;
 				case Image:
-					handleHideImage();
+					//handleHideImage();
 					break;
 				default:
 					break;
@@ -768,16 +784,19 @@ public class UiController {
 	}
 	
 	public void handleGoToSubReddit(Point p) {
-		for(int i = 0; i < this.pinnedGrid.size(); i++) {
-			Rectangle2D box = this.pinnedGrid.get(i);
-			if(box.contains(p)) {
-				// change state to loading
-				this.currentRedditState = RedditState.Loading;
-				// pull threads
-				// change state back at end of method call
-				this.initSubReddit(this.tempPinnedArray[i]);
-			}
-		}
+		this.currentRedditState = RedditState.Loading;
+		this.initSubReddit("r/tifu/");
+		//old code for going to pin sub reddits
+//		for(int i = 0; i < this.pinnedGrid.size(); i++) {
+//			Rectangle2D box = this.pinnedGrid.get(i);
+//			if(box.contains(p)) {
+//				// change state to loading
+//				this.currentRedditState = RedditState.Loading;
+//				// pull threads
+//				// change state back at end of method call
+//				//
+//			}
+//		}
 	}
 	
 	
@@ -813,6 +832,7 @@ public class UiController {
 				case 1:
 					this.currentState = State.REDDIT;
 					this.currentRedditState = RedditState.Home;
+					this.handleGoToSubReddit(null);
 					System.out.println("swtiching to reddit");
 					break;
 				case 2:

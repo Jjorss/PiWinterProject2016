@@ -90,56 +90,70 @@ public class RedditBoardBuilder {
 			}
 		}
 
-		try {
-			// Open a URL Stream
-			Response resultImageResponse = Jsoup.connect(t.getImgLink()).ignoreContentType(true).timeout(50000)
-					.execute();
-			// System.out.println(thread.getLink());
-
-			InputStream in = new ByteArrayInputStream(resultImageResponse.bodyAsBytes());
-			BufferedImage bImageFromConvert = ImageIO.read(in);
-			t.setImage(bImageFromConvert);
-		} catch (org.jsoup.HttpStatusException e) {
-
-			e.printStackTrace();
-
-			System.out.println("Bad link, could not pull image");
-			t.setImage(null);
-			// continue;
-
-		} catch (java.lang.IllegalArgumentException e) {
-			e.printStackTrace();
-			System.out.println("Bad link, Link was null");
-			t.setImage(null);
-			// continue;
-		} catch (javax.imageio.IIOException e) {
-			e.printStackTrace();
-			System.out.println("Bad Image, Image was corrupted.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (t.getImage() == null) {
-			System.out.println("image null" + "\t" + "Finally link: " + t.getImgLink());
-
-		} else {
-			System.out.println("good" + "\t" + "Finally link: " + t.getImgLink());
-		}
+//		try {
+//			// Open a URL Stream
+//			Response resultImageResponse = Jsoup.connect(t.getImgLink()).ignoreContentType(true).timeout(50000)
+//					.execute();
+//			// System.out.println(thread.getLink());
+//
+//			InputStream in = new ByteArrayInputStream(resultImageResponse.bodyAsBytes());
+//			BufferedImage bImageFromConvert = ImageIO.read(in);
+//			t.setImage(bImageFromConvert);
+//		} catch (org.jsoup.HttpStatusException e) {
+//
+//			e.printStackTrace();
+//
+//			System.out.println("Bad link, could not pull image");
+//			t.setImage(null);
+//			// continue;
+//
+//		} catch (java.lang.IllegalArgumentException e) {
+//			e.printStackTrace();
+//			System.out.println("Bad link, Link was null");
+//			t.setImage(null);
+//			// continue;
+//		} catch (javax.imageio.IIOException e) {
+//			e.printStackTrace();
+//			System.out.println("Bad Image, Image was corrupted.");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		if (t.getImage() == null) {
+//			System.out.println("image null" + "\t" + "Finally link: " + t.getImgLink());
+//
+//		} else {
+//			System.out.println("good" + "\t" + "Finally link: " + t.getImgLink());
+//		}
 		threads.add(t);
 		System.out.println("==========================================================");
 		System.out.println("Done, size: " + threads.size());
 
 	}
+//	public void getPost(Thread thread) {
+//		try {
+//			doc = Jsoup.connect(thread.getLink()).timeout(50000).userAgent("Mozilla").get();
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		System.out.println(doc.getElementsByClass("md"));
+//	}
 
 	
 	// test main
 	public static void main(String[] args) {
 		Program p = new Program();
 		UiController ui = new UiController(p);
-		RedditBoardBuilder rbb = new RedditBoardBuilder(ui, "r/frugalmalefashion/");
+		RedditBoardBuilder rbb = new RedditBoardBuilder(ui, "r/tifu/");
+		int index = 0;
 		try {
-			rbb.getData("r/frugalmalefashion/");
+			rbb.getData("r/tifu/");
+			for (Element thread : rbb.getPulledThreads()) {
+				rbb.makeThreads(thread);
+			}
+			
 		} catch (java.lang.IllegalArgumentException e) {
 			e.printStackTrace();
 			System.out.println("Bad link, Link was null");
