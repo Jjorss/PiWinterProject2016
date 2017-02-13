@@ -91,6 +91,9 @@ public class UiController {
 	private int numRows;
 	private int numCols;
 	private int totalNumCols = 0;
+	
+	private boolean moveThreadsRight = false;
+	private boolean moveThreadsLeft = true;
 
 	
 	private String[] tempArray = new String[]{"H", "R", "D", "T", "T", "T"};
@@ -343,6 +346,22 @@ public class UiController {
 			} 
 			break;
 		case REDDIT:
+			if (this.getCurrentRedditStat() == RedditState.Page) {
+				double x = this.getBoxes().get(this.getBoxes().size()-1).getX();
+				double x2 = this.getBoxes().get(0).getX();
+				if (this.moveThreadsLeft) {
+					this.moveLeft(5);
+				} else if (this.moveThreadsRight) {
+					this.moveRight(5);
+				}
+				if (x <= this.getContentBox().getX() && this.moveThreadsLeft) {
+					this.moveThreadsLeft = false;
+					this.moveThreadsRight = true;
+				} else if(x2 >= this.getContentBox().getX() && this.moveThreadsRight) {
+					this.moveThreadsLeft = true;
+					this.moveThreadsRight = false;
+				}
+			}
 			break;
 		case DRAW:
 			break;
@@ -351,6 +370,8 @@ public class UiController {
 		
 		}
 	}
+	
+	
 	
 	public void moveLeft(double speed) {
 		for (Rectangle2D box : boxes) {
@@ -718,13 +739,15 @@ public class UiController {
 
 	// should be a switch statement
 	public void handleDrag(Point p) {
-		if (this.currentState == State.REDDIT) {
-			if(p.getX() < program.getSourcePoint().getX()) {
-				this.moveLeft(program.getSourcePoint().getX() - p.getX());
-			} else {
-				this.moveRight(p.getX() - program.getSourcePoint().getX());
-			}
-		}
+		// dragging does not work for the screen i have, choosing to do:
+		// touch left half to go left, touch right to go right
+//		if (this.currentState == State.REDDIT) {
+//			if(p.getX() < program.getSourcePoint().getX()) {
+//				this.moveLeft(program.getSourcePoint().getX() - p.getX());
+//			} else {
+//				this.moveRight(p.getX() - program.getSourcePoint().getX());
+//			}
+//		}
 		if(this.currentState == State.DRAW) {
 			db.handleDraw(p);
 		}
@@ -777,6 +800,14 @@ public class UiController {
 			
 			}	
 		}
+	}
+	
+	public void handleOnPress() {
+		
+	}
+	
+	public void handleOnRelease(){
+		
 	}
 	
 	public void handleClickedAddPin() {

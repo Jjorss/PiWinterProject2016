@@ -35,6 +35,7 @@ public class Program extends JPanel{
         		   ui.getDb().getCurrentState() == DrawState.DRAW) {
         	   ui.getDb().setCurrentState(DrawState.END);
            }
+           ui.handleOnRelease();
             System.out.println("Moused Released!");
         }
 		@Override
@@ -45,6 +46,7 @@ public class Program extends JPanel{
 				ui.getDb().handleDraw(e.getPoint());
 				System.out.println("Moused Pressed !");
 			}
+			ui.handleOnPress();
 			
 		}
 		@Override
