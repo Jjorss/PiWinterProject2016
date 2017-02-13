@@ -95,16 +95,29 @@ public class WeatherMaker {
 				this.setWindSpeed((double)json.get("windSpeed"));
 			}
 			
-			if (json.get("nearestStormDistance").getClass().equals(Long.class)) {
-				this.setNearestStormDistance(((Long) json.get("nearestStormDistance")).doubleValue());
-			} else {
-				this.setNearestStormDistance((double)json.get("nearestStormDistance"));
+			try {
+				json.get("nearestStormDistance");
+				if (json.get("nearestStormDistance").getClass().equals(Long.class)) {
+					this.setNearestStormDistance(((Long) json.get("nearestStormDistance")).doubleValue());
+				} else {
+					this.setNearestStormDistance((double)json.get("nearestStormDistance"));
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+				this.nearestStormDistance = -1;
 			}
 			
 			this.setIcon((String)json.get("icon"));
 			//hourly = (JSONObject) hourly.get("summary");
 			System.out.println(json);
-			this.setHourlySummary((String)hourly.get("summary"));
+			try {
+				this.setHourlySummary((String)hourly.get("summary"));
+			} catch (Exception e) {
+				// couldn't find 
+				e.printStackTrace();
+				this.setHourlySummary("No summary for the hour.");
+			}
+			
 			
 			System.out.println("summary " +this.summary);
 			System.out.println("temp " +this.temperature);

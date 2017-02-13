@@ -147,7 +147,7 @@ public class UiController {
 				this.weatherRect.getHeight()*0.5);
 		
 		weather = new WeatherMaker(bi);
-		this.initWeather(weather);
+		//this.initWeather(weather);
 		
 		
 		timeRect = new Rectangle2D.Double(
@@ -227,8 +227,8 @@ public class UiController {
 		timerWeather.scheduleAtFixedRate(new TimerTask() {
 			  @Override
 			  public void run() {
-			    initWeather(weather);
-			    System.out.println("Pulling weather data");
+				  System.out.println("Pulling weather data");
+				  initWeather(weather);
 			  }
 			}, 0, 60*60*1000);
 		
@@ -350,9 +350,9 @@ public class UiController {
 				double x = this.getBoxes().get(this.getBoxes().size()-1).getX();
 				double x2 = this.getBoxes().get(0).getX();
 				if (this.moveThreadsLeft) {
-					this.moveLeft(5);
+					this.moveLeft(3);
 				} else if (this.moveThreadsRight) {
-					this.moveRight(5);
+					this.moveRight(3);
 				}
 				if (x <= this.getContentBox().getX() && this.moveThreadsLeft) {
 					this.moveThreadsLeft = false;
