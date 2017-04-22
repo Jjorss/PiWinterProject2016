@@ -19,7 +19,7 @@ public class BusBuilder {
 		times.clear();
 		title = "";
 		try {
-			doc = Jsoup.connect("https://www.udshuttle.com/simple/routes/2965/stops/226640")
+			doc = Jsoup.connect("https://www.udshuttle.com/simple/routes/636/stops/226640")
 					.timeout(50000).userAgent("Mozilla").get();
 			Elements list = doc.getElementsByTag("ul");
 			Elements title = doc.getElementsByTag("h2");
