@@ -62,7 +62,7 @@ public class Program extends JPanel{
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			ui.handleDrag(e.getPoint());
-			if (ui.getDb().getCurrentState() == DrawState.START) {
+			if (ui.getDb().getCurrentState() == DrawState.START && ui.getCurrentState() == State.DRAW) {
 				ui.getDb().setCurrentState(DrawState.DRAW);
 			}
 			System.out.println("Moused Dragged!");
@@ -132,6 +132,9 @@ public class Program extends JPanel{
         	this.ui.render(g);
         	break;
         case DRAW:
+        	this.ui.render(g);
+        	break;
+        case BUS:
         	this.ui.render(g);
         	break;
 		default:

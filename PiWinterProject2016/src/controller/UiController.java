@@ -24,6 +24,7 @@ import javax.swing.SwingWorker;
 
 import org.jsoup.nodes.Element;
 
+import model.BusBuilder;
 import model.DrawBuilder;
 import model.QuoteBuilder;
 import model.RedditBoardBuilder;
@@ -44,6 +45,7 @@ public class UiController {
 	private State currentState = State.LOADING;
 	private RedditState currentRedditState = RedditState.Home;
 	private PinController pinC = new PinController();
+	private BusBuilder bb = new BusBuilder();
 	
 	private Rectangle2D sideBar;
 	private Rectangle2D contentBox;
@@ -62,6 +64,13 @@ public class UiController {
 	private Rectangle2D redditHomeRectBottome;
 	// draw rectangles
 	private Rectangle2D drawClearBox;
+	// bus rectangles
+	private Rectangle2D busMainBox;
+	private Rectangle2D busTitleBox;
+	private Rectangle2D busTimesBox;
+	private Rectangle2D busTitleImageBox;
+	private Rectangle2D busTimesImageBox;
+	private Rectangle2D busRefreshButton;
 	
 	private List<Rectangle2D> boxes = new ArrayList<Rectangle2D>();
 	private List<Rectangle2D> iconBoxes = new ArrayList<Rectangle2D>();
@@ -80,6 +89,8 @@ public class UiController {
 	private BufferedImage quoteImage;
 	private BufferedImage focusedThreadImage;
 	private BufferedImage drawClearImage;
+	private BufferedImage busScheduleTitle;
+	private BufferedImage busScheduleTimes;
 	//private BufferedImage homeIcon; 
 	
 	private DateFormat dateFormatTime;
@@ -232,12 +243,71 @@ public class UiController {
 			  }
 			}, 0, 60*60*1000);
 		
-		
+		//this.initBusData();
 		bi.loadSideBarIcons();
+		
+		
 		
 		System.out.println("Initialized");		
 		this.currentState = State.HOME;
 		
+	}
+	
+	public void initBusData(){
+		this.bb.getData();
+		double busMainBoxWidth = this.contentBox.getWidth() * 0.9; 
+		double busMainBoxHeight = this.contentBox.getHeight() * 0.9; 
+		busMainBox = new Rectangle2D.Double(
+				(this.contentBox.getX() + (this.contentBox.getWidth()/2)) - (busMainBoxWidth/2),
+				(this.contentBox.getY() + (this.contentBox.getHeight()/2)) - (busMainBoxHeight/2),
+				busMainBoxWidth,
+				busMainBoxHeight);
+		double busTitleBoxWidth = this.busMainBox.getWidth();
+		double busTitleBoxHeight = this.busMainBox.getHeight()/2;
+		busTitleBox = new Rectangle2D.Double(
+				(this.busMainBox.getX() + (this.busMainBox.getWidth()/2)) - (busTitleBoxWidth/2),
+				(this.busMainBox.getY()), // + (this.busMainBox.getHeight()/2)) - (busTitleBoxHeight/2),
+				busTitleBoxWidth,
+				busTitleBoxHeight);
+		busTimesBox = new Rectangle2D.Double(
+				(this.busMainBox.getX() + (this.busMainBox.getWidth()/2)) - (busTitleBoxWidth/2),
+				((this.busTitleBox.getY()+this.busTitleBox.getHeight())),// + (this.busMainBox.getHeight()/2)) - (busTitleBoxHeight/2),
+				busTitleBoxWidth,
+				busTitleBoxHeight);
+		double busTitleImageBoxWidth = this.busTitleBox.getWidth()*0.9;
+		double busTitleImageBoxHeight = this.busTitleBox.getHeight()*0.9;
+		busTitleImageBox = new Rectangle2D.Double(
+				(this.busTitleBox.getX() + (this.busTitleBox.getWidth()/2)) - (busTitleImageBoxWidth/2),
+				(this.busTitleBox.getY() + (this.busTitleBox.getHeight()/2)) - (busTitleImageBoxHeight/2),
+				busTitleImageBoxWidth,
+				busTitleImageBoxHeight);
+		busTimesImageBox = new Rectangle2D.Double(
+				(this.busTimesBox.getX() + (this.busTimesBox.getWidth()/2)) - (busTitleImageBoxWidth/2),
+				(this.busTimesBox.getY() + (this.busTimesBox.getHeight()/2)) - (busTitleImageBoxHeight/2),
+				busTitleImageBoxWidth,
+				busTitleImageBoxHeight);
+		
+		busScheduleTitle = 
+				bi.makeBusScheduletitle(program.getGraphics(),
+						(Graphics2D)program.getGraphics(), this.bb.getTitle() + ":");
+		String times = "";
+		for (int i = 0 ; i < this.bb.getTimes().size(); i++){
+			if(i == 0) {
+				times = times + this.bb.getTimes().get(i);
+			} else{
+				times = times + ", " + this.bb.getTimes().get(i);
+			}
+		}
+		busScheduleTimes =
+				bi.makeBusScheduleTimes(program.getGraphics(), (Graphics2D)program.getGraphics(), times);
+		double busRefreshButtonWidth = this.contentBox.getWidth()*0.075;
+		double busRefreshButtonHeight = this.contentBox.getHeight()*0.075;
+		busRefreshButton = new Rectangle2D.Double(
+				(this.contentBox.getX() + this.contentBox.getWidth()) - busRefreshButtonWidth,
+				this.contentBox.getY(),
+				busRefreshButtonWidth,
+				busRefreshButtonHeight);
+		this.bi.loadBusImages();
 	}
 	
 	public void initWeather(WeatherMaker weather) {
@@ -443,10 +513,45 @@ public class UiController {
 			this.renderIcons(g2);
 			this.renderDrawClearButton(g2);
 			break;
+		case BUS:
+			this.renderContentBox(g2);
+			this.renderSideBar(g2);
+			this.renderIcons(g2);
+			this.renderBusSchedule(g2);
+			break;
 		default:
 			break;
 		}
 	
+	}
+	
+	public void renderBusSchedule(Graphics2D g2) {
+		//g2.setColor(Color.RED);
+		//g2.fill(this.busRefreshButton);
+		//g2.fill(busMainBox);
+		//g2.draw(busMainBox);
+		//g2.setColor(Color.BLUE);
+		//g2.draw(busTitleBox);
+		//g2.setColor(Color.BLACK);
+		//g2.draw(busTimesBox);
+		g2.drawImage(this.busScheduleTitle,
+				(int)this.busTitleImageBox.getX(),
+				(int)this.busTitleImageBox.getY(),
+				(int)this.busTitleImageBox.getWidth(),
+				(int)this.busTitleImageBox.getHeight(),
+				program);
+		g2.drawImage(this.busScheduleTimes,
+				(int)this.busTimesImageBox.getX(),
+				(int)this.busTimesImageBox.getY(),
+				(int)this.busTimesImageBox.getWidth(),
+				(int)this.busTimesImageBox.getHeight(),
+				this.program);
+		g2.drawImage(this.bi.getBusImages().get(0),
+				(int)this.busRefreshButton.getX(),
+				(int)this.busRefreshButton.getY(),
+				(int)this.busRefreshButton.getWidth(),
+				(int)this.busRefreshButton.getHeight(),
+				this.program);
 	}
 	
 	public void renderDrawClearButton(Graphics2D g2) {
@@ -729,6 +834,9 @@ public class UiController {
 		case REDDIT:
 			g2.setColor(new Color(255, 69, 0));
 			break;
+		case BUS:
+			g2.setColor(new Color(144, 222, 170));
+			break;
 		default:
 			break;
 		
@@ -793,6 +901,12 @@ public class UiController {
 				default:
 					break;
 				
+				}
+				break;
+			case BUS:
+				if (this.busRefreshButton.contains(p)) {
+					this.initBusData();
+					System.out.println("Reloading bus data");
 				}
 				break;
 			default:
@@ -868,7 +982,13 @@ public class UiController {
 					break;
 				case 2:
 					this.currentState = State.DRAW;
-					System.out.println("Switicng to draw board");
+					System.out.println("Switching to draw board");
+					break;
+				case 3:
+					this.currentState = State.BUS;
+					this.initBusData();
+					System.out.println("Switching to bus schedule");
+					break;
 				default:
 					break;
 				}

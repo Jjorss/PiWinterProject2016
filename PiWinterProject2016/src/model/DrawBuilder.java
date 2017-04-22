@@ -30,11 +30,13 @@ public class DrawBuilder {
 		switch(this.currentState) {
 		case DRAW:
 			this.createPixel( this.pixels.get(this.pixels.size()-1).getP2(), p);
+			System.out.println("Amount of pixels: " + this.pixels.size());
 			break;
 		case END:
 			break;
 		case START:
 			this.createPixel(p, p);
+			System.out.println("Amount of pixels: " + this.pixels.size());
 			break;
 		default:
 			break;

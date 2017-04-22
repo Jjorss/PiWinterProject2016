@@ -21,8 +21,11 @@ public class BufferedImageController {
 	private Program p;
 	private UiController ui;
 	
-	private String[] sideBarPaths = new String[]{"home.png","reddit.png", "draw.png", "calendar.png", "question_mark.png"};
+	private String[] sideBarPaths = new String[]{"home.png","reddit.png", "draw.png", "SchoolBus.png", "calendar.png"};
 	private List<BufferedImage> sideBarIcons = new ArrayList<BufferedImage>();
+	
+	private String[] busPaths = new String[]{"refresh.png"};
+	private List<BufferedImage>busImages = new ArrayList<BufferedImage>();
 	
 	private int homeAlpha = 170;
 	
@@ -31,6 +34,20 @@ public class BufferedImageController {
 		this.ui = ui;
 	}
 
+	public void loadBusImages(){
+		BufferedImage bi = null;
+		for(String path : busPaths) {
+			try {
+				URL url = BufferedImageController.class.getResource(
+						 "/bus/" + path);
+				bi = ImageIO.read(url);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			this.busImages.add(bi);
+		}
+	}
+	
 	public void loadSideBarIcons() {
 		BufferedImage bi = null;
 		for(String path : sideBarPaths) {
@@ -471,6 +488,83 @@ public class BufferedImageController {
         
 	}
 	
+	public BufferedImage makeBusScheduletitle(Graphics g, Graphics2D g2, String title){
+		int size = (int)(ui.getDisplayRect().getHeight()*0.05);
+		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
+		String string = "<html><body style='padding: "+ padding +"px;'>"
+                + "<h1 style='font-size:" + size + "px; text-align: center;'>"  + title + "</h1>"
+                + "</body></html>";
+				
+		
+		
+		JLabel textLabel = new JLabel(string);
+		textLabel.setSize(new Dimension(
+				(int)(ui.getDisplayRect().getWidth()*0.95),
+				(int)(ui.getDisplayRect().getHeight()*0.95)));
+
+
+        Dimension d = textLabel.getSize();
+
+        BufferedImage bi = new BufferedImage(
+                d.width,
+                d.height,
+                BufferedImage.TYPE_INT_ARGB);
+            g = bi.createGraphics();
+            g.setColor(new Color(255, 255, 255, homeAlpha));
+            g.fillRoundRect(
+                0,
+                0,
+                bi.getWidth(p),
+                bi.getHeight(p),
+                15,
+                10);
+            g.setColor(Color.black);
+        
+        textLabel.paint(g);
+
+        return bi;
+        
+	}
+	
+	public BufferedImage makeBusScheduleTimes(Graphics g, Graphics2D g2, String title){
+		int size = (int)(ui.getDisplayRect().getHeight()*0.05);
+		int padding = (int)(ui.getContentBox().getWidth() * 0.01);
+		String string = "<html><body style='padding: "+ padding +"px;'>"
+                + "<h1 style='font-size:" + size + "px; text-align: center;'>"  + title + "</h1>"
+                + "</body></html>";
+				
+		
+		
+		JLabel textLabel = new JLabel(string);
+		textLabel.setSize(new Dimension(
+				(int)(ui.getDisplayRect().getWidth()*0.95),
+				(int)(ui.getDisplayRect().getHeight()*0.95)));
+
+
+        Dimension d = textLabel.getSize();
+
+        BufferedImage bi = new BufferedImage(
+                d.width,
+                d.height,
+                BufferedImage.TYPE_INT_ARGB);
+            g = bi.createGraphics();
+            g.setColor(new Color(255, 255, 255, homeAlpha));
+            g.fillRoundRect(
+                0,
+                0,
+                bi.getWidth(p),
+                bi.getHeight(p),
+                15,
+                10);
+            g.setColor(Color.black);
+        
+        textLabel.paint(g);
+
+        return bi;
+        
+	}
+	
+	
 	public Resolution scaleImage(int width, int height, int maxWidth, int maxHeight) {
 		boolean scaled = false;
 		int newWidth = width;
@@ -514,6 +608,14 @@ public class BufferedImageController {
 
 	public int getHomeAlpha() {
 		return homeAlpha;
+	}
+
+	public List<BufferedImage> getBusImages() {
+		return busImages;
+	}
+
+	public void setBusImages(List<BufferedImage> busImages) {
+		this.busImages = busImages;
 	}
 	
 }
