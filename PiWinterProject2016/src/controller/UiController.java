@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -81,6 +82,9 @@ public class UiController {
 	private List<BufferedImage> posts = new ArrayList<BufferedImage>();
 	private List<BufferedImage> pins = new ArrayList<BufferedImage>();
 	
+	private List<AnimationController> weatherAnimations = new ArrayList<AnimationController>();
+	private AnimationController displayAnimation;
+	
 	
 	private BufferedImage temperatureImage;
 	private BufferedImage weatherDataImage;
@@ -105,6 +109,8 @@ public class UiController {
 	
 	private boolean moveThreadsRight = false;
 	private boolean moveThreadsLeft = true;
+	
+	//private AnimationController weatherAnimation;
 
 	
 	private String[] tempArray = new String[]{"H", "R", "D", "T", "T", "T"};
@@ -113,6 +119,8 @@ public class UiController {
 	private String loadingThreadStatus = "0%";
 	
 	private Timer timerWeather = new Timer();
+	private Timer timerRunDisplayAnimation = new Timer();
+	private boolean runDisplayanimation = false;
 	
 	
 	public UiController(Program program){
@@ -243,8 +251,23 @@ public class UiController {
 			  }
 			}, 0, 60*60*1000);
 		
+		timerRunDisplayAnimation.scheduleAtFixedRate(new TimerTask() {
+			  @Override
+			  public void run() {
+				  System.out.println("Running display animation");
+				  setRunDisplayanimation(true);
+			  }
+			}, 0, 5 * 10 * 1000);
+		this.displayAnimation = new AnimationController(
+				500,
+				new Point((int)this.displayRect.getX(), (int)this.displayRect.getY()),
+				new Point((int)this.displayRect.getX(), (int)this.displayRect.getY()),
+				this);
+		
 		//this.initBusData();
 		bi.loadSideBarIcons();
+		
+		
 		
 		
 		
@@ -340,6 +363,47 @@ public class UiController {
 				this.weatherDataRect.getY() + this.weatherDataRect.getHeight(),
 				this.weatherRect.getWidth() - this.weatherSummaryRect.getWidth(),
 				this.weatherRect.getHeight() - this.weatherDataRect.getHeight());
+		
+		bi.loadAnimationImages();
+		
+//		this.weatherAnimation = new AnimationController(1, 
+//				new Point((int)this.weatherIconRect.getX() + ((int)this.getWeatherDataImage().getWidth() - 100), 
+//						(int)this.weatherIconRect.getY()),
+//				new Point((int)this.weatherIconRect.getX(), (int)this.weatherIconRect.getY()),
+//				bi.getAnimationImages().get(0));
+		this.initWeatherAnimations(weather, 3);
+	}
+	
+	public void initWeatherAnimations(WeatherMaker weather, int amount){
+		BufferedImage image = null;
+		String weatherType = weather.getIcon();
+		if(weatherType.equals("cloudy") ||
+				weatherType.equals("partly-cloudy-day") ||
+				weatherType.equals("partly-cloudy-night")) {
+			image = bi.getAnimationImages().get(0);
+		} else if(weatherType.equals("rain")) {
+			image = bi.getAnimationImages().get(1);
+		} else if(weatherType.equals("clear-day")) {
+			image = bi.getAnimationImages().get(2);
+		} else {
+			image = bi.getAnimationImages().get(0);
+		}
+		
+		for(int i = 0; i < amount; i++) {
+			Random rand = new Random();
+			int randomY = (int) (this.weatherIconRect.getY() + ((int)(this.getWeatherDataImage().getWidth()*0.15)*i));
+			
+			int randomSpeed = (int)(rand.nextInt(3) + 1);
+			this.weatherAnimations.add(new AnimationController(
+					randomSpeed, 
+					new Point((int)this.weatherIconRect.getX() + ((int)this.getWeatherDataImage().getWidth() - 
+							((int)((this.getWeatherDataImage().getWidth()*0.15)*0.3))), 
+							randomY),
+					new Point((int)this.weatherIconRect.getX(), (int)this.weatherIconRect.getY()),
+					image,
+					this
+					));
+		}
 	}
 	
 	public void initSubReddit(String subReddit) {
@@ -414,6 +478,12 @@ public class UiController {
 				this.quoteImage = bi.makeQuote(program.getGraphics(), (Graphics2D)program.getGraphics()
 						, qb.getDailyQuotes(), qb.getAuthor());
 			} 
+			for(AnimationController animation: weatherAnimations){
+				animation.update();
+			}
+			if (this.isRunDisplayanimation()) {
+				this.displayAnimation.runDisplayAnimation();
+			}
 			break;
 		case REDDIT:
 			if (this.getCurrentRedditStat() == RedditState.Page) {
@@ -461,13 +531,18 @@ public class UiController {
 		case LOADING:
 			break;
 		case HOME:
-			this.renderSideBar(g2);
+			
 			this.renderContentBox(g2);
 			//this.renderIconsBoxes(g2);
-			this.renderIcons(g2);
 			this.renderWetherRect(g2);
 			this.renderTime(g2);
 			this.renderDisplay(g2);
+			this.renderSideBar(g2);
+			this.renderIcons(g2);
+			for(AnimationController animation: weatherAnimations){
+				animation.render(g2);
+			}
+			
 			break;
 		case REDDIT:
 			this.renderContentBox(g2);
@@ -696,6 +771,7 @@ public class UiController {
 				(int)this.quoteImage.getWidth(),
 				(int)this.quoteImage.getHeight(),
 				program);
+		
 //		int displayWidth = (int)(this.displayRect.getWidth()*0.95);
 //		int dsiplayHeight = (int)(this.displayRect.getHeight()*0.95);
 //		g2.setColor(new Color(255, 255, 255, 128));
@@ -1323,6 +1399,14 @@ public class UiController {
 
 	public void setBoxes(List<Rectangle2D> boxes) {
 		this.boxes = boxes;
+	}
+
+	public boolean isRunDisplayanimation() {
+		return runDisplayanimation;
+	}
+
+	public void setRunDisplayanimation(boolean runDisplayanimation) {
+		this.runDisplayanimation = runDisplayanimation;
 	}
 
 }

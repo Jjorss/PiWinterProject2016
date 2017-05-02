@@ -27,6 +27,9 @@ public class BufferedImageController {
 	private String[] busPaths = new String[]{"refresh.png"};
 	private List<BufferedImage>busImages = new ArrayList<BufferedImage>();
 	
+	private String[] animationPaths = new String[]{"cloud.png", "rain_cloud.png", "sun.png"};
+	private List<BufferedImage>animationImages = new ArrayList<BufferedImage>();
+	
 	private int homeAlpha = 170;
 	
 	public BufferedImageController(Program p, UiController ui){
@@ -45,6 +48,20 @@ public class BufferedImageController {
 				e.printStackTrace();
 			}
 			this.busImages.add(bi);
+		}
+	}
+	
+	public void loadAnimationImages() {
+		BufferedImage bi = null;
+		for(String path : animationPaths) {
+			try {
+				URL url = BufferedImageController.class.getResource(
+						 "/animations/" + path);
+				bi = ImageIO.read(url);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			this.animationImages.add(bi);
 		}
 	}
 	
@@ -616,6 +633,14 @@ public class BufferedImageController {
 
 	public void setBusImages(List<BufferedImage> busImages) {
 		this.busImages = busImages;
+	}
+
+	public List<BufferedImage> getAnimationImages() {
+		return animationImages;
+	}
+
+	public void setAnimationImages(List<BufferedImage> animationImages) {
+		this.animationImages = animationImages;
 	}
 	
 }
